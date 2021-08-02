@@ -43,7 +43,7 @@ while getopts ":d:o:m:f:t:a:p:bg" i; do
                 benchmark=true
         ;;
         g)
-                use_gpu=true
+                use_gpu=false
         ;;
         a)
                 gpu_devices=$OPTARG
@@ -68,7 +68,7 @@ if [[ "$benchmark" == "" ]] ; then
 fi
 
 if [[ "$use_gpu" == "" ]] ; then
-    use_gpu=true
+    use_gpu=false
 fi
 
 if [[ "$gpu_devices" == "" ]] ; then
