@@ -59,6 +59,12 @@ I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` a
 
 
 
+## Other Files
+
+In `./Alphafold` folder, I modified some python files (`hhblits.py`, `hmmsearch.py`, `jackhmmer.py`) , give these steps more CPUs for acceleration. But  these processes have been tested and shown to be unable to accelerate by  providing more CPU. Maybe this is because 
+
+Probably because DeepMind uses a wrapped process, I'm trying to improve it (work in progress).
+
 
 
 If you have any question, please send your problem in issues
