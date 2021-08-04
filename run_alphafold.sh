@@ -1,6 +1,7 @@
 #!/bin/bash
 # Description: AlphaFold non-docker version
 # Author: Sanjay Kumar Srikakulam
+# Modified by Bozitao Zhong
 
 usage() {
         echo ""

@@ -84,8 +84,8 @@ if [[ "$preset" != "full_dbs" && "$preset" != "casp14" ]] ; then
     preset="full_dbs"
 fi
 
-# This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits
-alphafold_script="$(readlink -f $(dirname $0))/run_alphafold.py"  
+# This bash script looks for the run_feature.py script in its current working directory, if it does not exist then exits
+alphafold_script="$(readlink -f $(dirname $0))/run_feature.py"  
 
 if [ ! -f "$alphafold_script" ]; then
     echo "Alphafold python script $alphafold_script does not exist."
