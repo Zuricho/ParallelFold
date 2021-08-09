@@ -59,11 +59,21 @@ I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` a
 
 
 
+## What is this for
+
+ParallelFold can help you accelerate Alphafold when you want to predict multiple sequences. After dividing the CPU part and GPU part, users can finish feature step by multiple processors.
+
+Using ParallelFold, you can run Alphafold 2~3 times faster than DeepMind's procedure. 
+
+
+
 ## Other Files
 
-In `./Alphafold` folder, I modified some python files (`hhblits.py`, `hmmsearch.py`, `jackhmmer.py`) , give these steps more CPUs for acceleration. But  these processes have been tested and shown to be unable to accelerate by  providing more CPU. Maybe this is because 
+In `./Alphafold` folder, I modified some python files (`hhblits.py`, `hmmsearch.py`, `jackhmmer.py`) , give these steps more CPUs for acceleration. But  these processes have been tested and shown to be unable to accelerate by  providing more CPU. Probably because DeepMind uses a wrapped process, I'm trying to improve it (work in progress).
 
-Probably because DeepMind uses a wrapped process, I'm trying to improve it (work in progress).
+
+
+I have also modified `run_feature.sh` and `run_alphafold.sh` to make them find the alphafold folder, which means that you can use it in another folder. But you need to change `alphafold/common/restrains.py`. In this file it use a relative path to find the restraint file, you need to change it to absolute path.
 
 
 
