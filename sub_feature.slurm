@@ -11,4 +11,4 @@
 module load miniconda3
 source activate alphafold
 cd /lustre/home/acct-stu/stu/ParallelFold
-./run_feature.sh -d data -o output -m model_1 -f input/* -t 1800-01-01
+./run_feature.sh -d data -o output -m model_1 -f input/GA98.fasta,input/GB98.fasta -t 1800-01-01
