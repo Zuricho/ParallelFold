@@ -2,21 +2,21 @@
 
 Author: [Bozitao Zhong](zbztzhz@sjtu.edu.cn)
 
-This is a modified version of DeepMind's [Alphafold2](https://github.com/deepmind/alphafold) to divide **CPU part** (MSA and template searching) and **GPU part** (prediction model) of Alphafold2 local version.
+This is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to divide **CPU part** (MSA and template searching) and **GPU part** (prediction model) of AlphaFold2 local version.
 
 
 
 ## How to install 
 
-First you should install Alphafold2. You can choose one of the following methods to install Alphafold locally.
+First you should install AlphaFold2. You can choose one of the following methods to install AlphaFold locally.
 
 - Use [official version](https://github.com/deepmind/alphafold) from DeepMind with docker. 
-- There are some [other versions](https://github.com/kalininalab/alphafold_non_docker) install Alphafold without docker. 
-- Also you can use [my guide](https://github.com/Zuricho/Alphafold_local) which based on non_docker version and it can adjust to different cuda versions (cuda driver >= 10.1) 
+- There are some [other versions](https://github.com/kalininalab/alphafold_non_docker) install AlphaFold without docker. 
+- Also you can use [my guide](https://github.com/Zuricho/AlphaFold_local) which based on non_docker version and it can adjust to different cuda versions (cuda driver >= 10.1) 
 
 
 
-Then, put these 4 files in your Alphafold folder, this folder should have an original `run_alphafold.py` file, and I use a `run_alphafold.sh` file to run Alphafold easily (learned from [non_docker version](https://github.com/kalininalab/alphafold_non_docker))
+Then, put these 4 files in your AlphaFold folder, this folder should have an original `run_alphafold.py` file, and I use a `run_alphafold.sh` file to run AlphaFold easily (learned from [non_docker version](https://github.com/kalininalab/alphafold_non_docker))
 
 4 files:
 
@@ -61,9 +61,9 @@ I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` a
 
 ## What is this for
 
-ParallelFold can help you accelerate Alphafold when you want to predict multiple sequences. After dividing the CPU part and GPU part, users can finish feature step by multiple processors.
+ParallelFold can help you accelerate AlphaFold when you want to predict multiple sequences. After dividing the CPU part and GPU part, users can finish feature step by multiple processors.
 
-Using ParallelFold, you can run Alphafold 2~3 times faster than DeepMind's procedure. 
+Using ParallelFold, you can run AlphaFold 2~3 times faster than DeepMind's procedure. 
 
 
 
