@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=model_Af
+#SBATCH --job-name=model_ParaFold
 #SBATCH --partition=dgx2
 ##SBATCH -w vol08
 #SBATCH -N 1
@@ -9,7 +9,6 @@
 #SBATCH --output=task_file/%j_%x.out
 #SBATCH --error=task_file/%j_%x.err
 
-module load cuda/10.1.243-gcc-8.3.0
 module load miniconda3
 source activate alphafold_cuda10
 cd /lustre/home/acct-stu/stu/parallelfold

@@ -59,7 +59,7 @@ pip install tensorflow==2.3.0
 ```bash
 # Using conda
 conda install -c conda-forge openmm=7.5.1 pdbfixer=1.7
-conda install -c bioconda hmmer=3.3.2 hhsuite=3.3.0 kalign2=2.0.4
+conda install -c bioconda hmmer=3.3.2 hhsuite=3.3.0 kalign2=2.04
 
 # Using pip
 pip install biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.6 immutabledict==2.0.0 jax==0.2.14 ml-collections==0.1.0
@@ -80,7 +80,7 @@ Here you should used cuda 10.1 when you use cuda 10.1
 ### Clone This Repo
 
 ```bash
-git clone git@github.com:Zuricho/ParallelFold.git
+git clone https://github.com/Zuricho/ParallelFold.git
 alphafold_path="/path/to/alphafold/git/repo"
 ```
 
@@ -88,7 +88,7 @@ alphafold_path="/path/to/alphafold/git/repo"
 
 ### Final Steps
 
-**Download chemical properties to the common folder**
+**[Not Necessary] Download chemical properties to the common folder**
 
 You need to check if you have the `stereo_chemical_props.txt` file in `alphafold/alphafold/common/ `folder, if you don't have it, you need to download this file:
 
@@ -110,6 +110,15 @@ patch -p0 < $alphafold_path/docker/openmm.patch
 Their might be some available modules: `cuda/10.1.243-gcc-8.3.0`, `cuda/10.2.89-gcc-8.3.0`
 
 Using this kind of cuda you can skip `conda install cudatoolkit`
+
+**chmod**
+
+give the executive permission for sh files:
+
+```bash
+chmod +x run_feature.sh
+chmod +x run_alphafold.sh
+```
 
 
 
@@ -166,7 +175,7 @@ Using ParallelFold, you can run AlphaFold 2~3 times faster than DeepMind's proce
 
 ## Other Files
 
-In `./Alphafold` folder, I modified some python files (`hhblits.py`, `hmmsearch.py`, `jackhmmer.py`) , give these steps more CPUs for acceleration. But  these processes have been tested and shown to be unable to accelerate by  providing more CPU. Probably because DeepMind uses a wrapped process, I'm trying to improve it (work in progress).
+In `./alphafold` folder, I modified some python files (`hhblits.py`, `hmmsearch.py`, `jackhmmer.py`) , give these steps more CPUs for acceleration. But  these processes have been tested and shown to be unable to accelerate by  providing more CPU. Probably because DeepMind uses a wrapped process, I'm trying to improve it (work in progress).
 
 
 
