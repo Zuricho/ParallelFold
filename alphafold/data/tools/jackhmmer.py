@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Modified CPU cores
-
 """Library to run Jackhmmer from Python."""
 
 from concurrent import futures
@@ -36,7 +34,7 @@ class Jackhmmer:
                *,
                binary_path: str,
                database_path: str,
-               n_cpu: int = 8,   # Default 8
+               n_cpu: int = 8,
                n_iter: int = 1,
                e_value: float = 0.0001,
                z_value: Optional[int] = None,

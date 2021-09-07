@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Modified CPU cores
-
 """A Python wrapper for hmmsearch - search profile against a sequence db."""
 
 import os
@@ -21,10 +19,8 @@ import subprocess
 from typing import Optional, Sequence
 
 from absl import logging
-
-# Internal import (7716).
-
 from alphafold.data.tools import utils
+# Internal import (7716).
 
 
 class Hmmsearch(object):
@@ -64,7 +60,7 @@ class Hmmsearch(object):
       cmd = [
           self.binary_path,
           '--noali',  # Don't include the alignment in stdout.
-          '--cpu', '8'  # Default 8
+          '--cpu', '8'
       ]
       # If adding flags, we have to do so before the output and input:
       if self.flags:

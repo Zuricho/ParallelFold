@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Modified CPU cores
-
 """Library to run HHblits from Python."""
 
 import glob
@@ -37,7 +35,7 @@ class HHBlits:
                *,
                binary_path: str,
                databases: Sequence[str],
-               n_cpu: int = 4,  # default int = 4
+               n_cpu: int = 4,
                n_iter: int = 3,
                e_value: float = 0.001,
                maxseq: int = 1_000_000,
