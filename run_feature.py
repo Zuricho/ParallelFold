@@ -104,17 +104,12 @@ def _check_flag(flag_name: str, preset: str, should_be_set: bool):
     raise ValueError(f'{flag_name} must {verb} set for preset "{preset}"')
 
 
-def predict_structure(
+def predict_feature(
     fasta_path: str,
     fasta_name: str,
     output_dir_base: str,
-    data_pipeline: pipeline.DataPipeline,
-    model_runners: Dict[str, model.RunModel],
-    amber_relaxer: relax.AmberRelaxation,
-    benchmark: bool,
-    random_seed: int):
-  """Predicts structure using AlphaFold for the given sequence."""
-  timings = {}
+    data_pipeline: pipeline.DataPipeline):
+  """Predicts feature as input for AlphaFold for given sequence."""
   output_dir = os.path.join(output_dir_base, fasta_name)
   if not os.path.exists(output_dir):
     os.makedirs(output_dir)
@@ -124,87 +119,21 @@ def predict_structure(
 
   # Get features.
   t_0 = time.time()
-  feature_dict = data_pipeline.process(
+  features_output_path = os.path.join(output_dir, 'features.pkl')
+
+  # If we already have feature.pkl file, skip MSA and template step
+  if os.path.exists(features_output_path):
+    logging.info('%s feature file exists', fasta_name)
+
+  else:
+    feature_dict = data_pipeline.process(
       input_fasta_path=fasta_path,
       msa_output_dir=msa_output_dir)
-  timings['features'] = time.time() - t_0
 
-  # Write out features as a pickled dictionary.
-  features_output_path = os.path.join(output_dir, 'features.pkl')
-  with open(features_output_path, 'wb') as f:
-    pickle.dump(feature_dict, f, protocol=4)
-  
-  sys.exit(0)
+    # Write out features as a pickled dictionary.
+    with open(features_output_path, 'wb') as f:
+      pickle.dump(feature_dict, f, protocol=4)
 
-  relaxed_pdbs = {}
-  plddts = {}
-
-  # Run the models.
-  for model_name, model_runner in model_runners.items():
-    logging.info('Running model %s', model_name)
-    t_0 = time.time()
-    processed_feature_dict = model_runner.process_features(
-        feature_dict, random_seed=random_seed)
-    timings[f'process_features_{model_name}'] = time.time() - t_0
-
-    t_0 = time.time()
-    prediction_result = model_runner.predict(processed_feature_dict)
-    t_diff = time.time() - t_0
-    timings[f'predict_and_compile_{model_name}'] = t_diff
-    logging.info(
-        'Total JAX model %s predict time (includes compilation time, see --benchmark): %.0f?',
-        model_name, t_diff)
-
-    if benchmark:
-      t_0 = time.time()
-      model_runner.predict(processed_feature_dict)
-      timings[f'predict_benchmark_{model_name}'] = time.time() - t_0
-
-    # Get mean pLDDT confidence metric.
-    plddts[model_name] = np.mean(prediction_result['plddt'])
-
-    # Save the model outputs.
-    result_output_path = os.path.join(output_dir, f'result_{model_name}.pkl')
-    with open(result_output_path, 'wb') as f:
-      pickle.dump(prediction_result, f, protocol=4)
-
-    unrelaxed_protein = protein.from_prediction(processed_feature_dict,
-                                                prediction_result)
-
-    unrelaxed_pdb_path = os.path.join(output_dir, f'unrelaxed_{model_name}.pdb')
-    with open(unrelaxed_pdb_path, 'w') as f:
-      f.write(protein.to_pdb(unrelaxed_protein))
-
-    # Relax the prediction.
-    t_0 = time.time()
-    relaxed_pdb_str, _, _ = amber_relaxer.process(prot=unrelaxed_protein)
-    timings[f'relax_{model_name}'] = time.time() - t_0
-
-    relaxed_pdbs[model_name] = relaxed_pdb_str
-
-    # Save the relaxed PDB.
-    relaxed_output_path = os.path.join(output_dir, f'relaxed_{model_name}.pdb')
-    with open(relaxed_output_path, 'w') as f:
-      f.write(relaxed_pdb_str)
-
-  # Rank by pLDDT and write out relaxed PDBs in rank order.
-  ranked_order = []
-  for idx, (model_name, _) in enumerate(
-      sorted(plddts.items(), key=lambda x: x[1], reverse=True)):
-    ranked_order.append(model_name)
-    ranked_output_path = os.path.join(output_dir, f'ranked_{idx}.pdb')
-    with open(ranked_output_path, 'w') as f:
-      f.write(relaxed_pdbs[model_name])
-
-  ranking_output_path = os.path.join(output_dir, 'ranking_debug.json')
-  with open(ranking_output_path, 'w') as f:
-    f.write(json.dumps({'plddts': plddts, 'order': ranked_order}, indent=4))
-
-  logging.info('Final timings for %s: %s', fasta_name, timings)
-
-  timings_output_path = os.path.join(output_dir, 'timings.json')
-  with open(timings_output_path, 'w') as f:
-    f.write(json.dumps(timings, indent=4))
 
 
 def main(argv):
@@ -250,41 +179,14 @@ def main(argv):
       template_featurizer=template_featurizer,
       use_small_bfd=use_small_bfd)
 
-  model_runners = {}
-  for model_name in FLAGS.model_names:
-    model_config = config.model_config(model_name)
-    model_config.data.eval.num_ensemble = num_ensemble
-    model_params = data.get_model_haiku_params(
-        model_name=model_name, data_dir=FLAGS.data_dir)
-    model_runner = model.RunModel(model_config, model_params)
-    model_runners[model_name] = model_runner
-
-  logging.info('Have %d models: %s', len(model_runners),
-               list(model_runners.keys()))
-
-  amber_relaxer = relax.AmberRelaxation(
-      max_iterations=RELAX_MAX_ITERATIONS,
-      tolerance=RELAX_ENERGY_TOLERANCE,
-      stiffness=RELAX_STIFFNESS,
-      exclude_residues=RELAX_EXCLUDE_RESIDUES,
-      max_outer_iterations=RELAX_MAX_OUTER_ITERATIONS)
-
-  random_seed = FLAGS.random_seed
-  if random_seed is None:
-    random_seed = random.randrange(sys.maxsize)
-  logging.info('Using random seed %d for the data pipeline', random_seed)
-
   # Predict structure for each of the sequences.
   for fasta_path, fasta_name in zip(FLAGS.fasta_paths, fasta_names):
-    predict_structure(
+    predict_feature(
         fasta_path=fasta_path,
         fasta_name=fasta_name,
         output_dir_base=FLAGS.output_dir,
-        data_pipeline=data_pipeline,
-        model_runners=model_runners,
-        amber_relaxer=amber_relaxer,
-        benchmark=FLAGS.benchmark,
-        random_seed=random_seed)
+        data_pipeline=data_pipeline)
+    logging.info('%s AlphaFold feature COMPLETE', fasta_name)
 
 
 if __name__ == '__main__':

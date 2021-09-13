@@ -17,12 +17,13 @@ usage() {
     proteins (default: 'False')"
         echo "-g <use_gpu>      Enable NVIDIA runtime to run with GPUs (default: 'True')"
         echo "-a <gpu_devices>  Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
-        echo "-p <preset>       Choose preset model configuration - no ensembling (full_dbs) or 8 model ensemblings (casp14) (default: 'full_dbs')"
+        echo "-p <preset>       Choose preset model configuration - no ensembling (full_dbs) or 8 model ensemblings (casp14) (default: 'full_dbs')"\
+        echo "-r <amber_relax>  Skip AMBER refinemet for predicted structure (default: 'True')"
         echo ""
         exit 1
 }
 
-while getopts ":d:o:m:f:t:a:p:bg" i; do
+while getopts ":d:o:m:f:t:a:p:bgr" i; do
         case "${i}" in
         d)
                 data_dir=$OPTARG
@@ -51,6 +52,9 @@ while getopts ":d:o:m:f:t:a:p:bg" i; do
         p)
                 preset=$OPTARG
         ;;
+        r)
+                amber_relaxation=false
+        ;;
         esac
 done
 
@@ -72,7 +76,7 @@ if [[ "$use_gpu" == "" ]] ; then
 fi
 
 if [[ "$gpu_devices" == "" ]] ; then
-    gpu_devices="all"
+    gpu_devices="0"
 fi
 
 if [[ "$preset" == "" ]] ; then
@@ -82,6 +86,10 @@ fi
 if [[ "$preset" != "full_dbs" && "$preset" != "casp14" ]] ; then
     echo "Unknown preset! Using default ('full_dbs')"
     preset="full_dbs"
+fi
+
+if [[ "$amber_relaxation" == "" ]] ; then
+    amber_relaxation=true
 fi
 
 # This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits
@@ -100,7 +108,7 @@ if [[ "$use_gpu" == true ]] ; then
     export CUDA_VISIBLE_DEVICES=0
 
     if [[ "$gpu_devices" ]] ; then
-        export CUDA_VISIBLE_DEVICES=0
+        export CUDA_VISIBLE_DEVICES=$gpu_devices
     fi
 fi
 
@@ -123,4 +131,4 @@ jackhmmer_binary_path=$(which jackhmmer)
 kalign_binary_path=$(which kalign)
 
 # Run AlphaFold with required parameters
-$(python $alphafold_script --hhblits_binary_path=$hhblits_binary_path --hhsearch_binary_path=$hhsearch_binary_path --jackhmmer_binary_path=$jackhmmer_binary_path --kalign_binary_path=$kalign_binary_path --bfd_database_path=$bfd_database_path --mgnify_database_path=$mgnify_database_path --template_mmcif_dir=$template_mmcif_dir --obsolete_pdbs_path=$obsolete_pdbs_path --pdb70_database_path=$pdb70_database_path --uniclust30_database_path=$uniclust30_database_path --uniref90_database_path=$uniref90_database_path --data_dir=$data_dir --output_dir=$output_dir --fasta_paths=$fasta_path --model_names=$model_names --max_template_date=$max_template_date --preset=$preset --benchmark=$benchmark --logtostderr)
+$(python $alphafold_script --hhblits_binary_path=$hhblits_binary_path --hhsearch_binary_path=$hhsearch_binary_path --jackhmmer_binary_path=$jackhmmer_binary_path --kalign_binary_path=$kalign_binary_path --bfd_database_path=$bfd_database_path --mgnify_database_path=$mgnify_database_path --template_mmcif_dir=$template_mmcif_dir --obsolete_pdbs_path=$obsolete_pdbs_path --pdb70_database_path=$pdb70_database_path --uniclust30_database_path=$uniclust30_database_path --uniref90_database_path=$uniref90_database_path --data_dir=$data_dir --output_dir=$output_dir --fasta_paths=$fasta_path --model_names=$model_names --max_template_date=$max_template_date --preset=$preset --benchmark=$benchmark --amber_relaxation=$amber_relaxation --logtostderr)

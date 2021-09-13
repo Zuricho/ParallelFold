@@ -20,7 +20,7 @@ import pickle
 import random
 import sys
 import time
-from typing import Dict
+from typing import Dict, Tuple
 
 from absl import app
 from absl import flags
@@ -88,6 +88,8 @@ flags.DEFINE_integer('random_seed', None, 'The random seed for the data '
                      'that even if this is set, Alphafold may still not be '
                      'deterministic, because processes like GPU inference are '
                      'nondeterministic.')
+flags.DEFINE_boolean('amber_relaxation', True, 'Use AMBER force field to relax '
+                     'predicted protein structure, default is True.')
 FLAGS = flags.FLAGS
 
 MAX_TEMPLATE_HITS = 20
@@ -113,7 +115,7 @@ def predict_structure(
     amber_relaxer: relax.AmberRelaxation,
     benchmark: bool,
     random_seed: int):
-  """Predicts structure using AlphaFold for the given sequence."""
+  """Predicts structure using AlphaFold for given sequence."""
   timings = {}
   output_dir = os.path.join(output_dir_base, fasta_name)
   if not os.path.exists(output_dir):
@@ -124,9 +126,9 @@ def predict_structure(
 
   # Get features.
   t_0 = time.time()
-  # Write out features as a pickled dictionary.
   features_output_path = os.path.join(output_dir, 'features.pkl')
 
+  # If we already have feature.pkl file, skip the MSA and template finding step
   if os.path.exists(features_output_path):
     feature_dict = pickle.load(open(features_output_path, 'rb'))
 
@@ -180,17 +182,20 @@ def predict_structure(
     with open(unrelaxed_pdb_path, 'w') as f:
       f.write(protein.to_pdb(unrelaxed_protein))
 
-    # Relax the prediction.
-    t_0 = time.time()
-    relaxed_pdb_str, _, _ = amber_relaxer.process(prot=unrelaxed_protein)
-    timings[f'relax_{model_name}'] = time.time() - t_0
+    if FLAGS.amber_relaxation == True:
+      # Relax the prediction.
+      t_0 = time.time()
+      relaxed_pdb_str, _, _ = amber_relaxer.process(prot=unrelaxed_protein)
+      timings[f'relax_{model_name}'] = time.time() - t_0
 
-    relaxed_pdbs[model_name] = relaxed_pdb_str
+      relaxed_pdbs[model_name] = relaxed_pdb_str
 
-    # Save the relaxed PDB.
-    relaxed_output_path = os.path.join(output_dir, f'relaxed_{model_name}.pdb')
-    with open(relaxed_output_path, 'w') as f:
-      f.write(relaxed_pdb_str)
+      # Save the relaxed PDB.
+      relaxed_output_path = os.path.join(output_dir, f'relaxed_{model_name}.pdb')
+      with open(relaxed_output_path, 'w') as f:
+        f.write(relaxed_pdb_str)
+    else:
+      relaxed_pdbs[model_name] = protein.to_pdb(unrelaxed_protein)
 
   # Rank by pLDDT and write out relaxed PDBs in rank order.
   ranked_order = []
@@ -290,6 +295,7 @@ def main(argv):
         amber_relaxer=amber_relaxer,
         benchmark=FLAGS.benchmark,
         random_seed=random_seed)
+    logging.info('%s AlphaFold structure prediction COMPLETE', fasta_name)
 
 
 if __name__ == '__main__':

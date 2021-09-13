@@ -1,6 +1,6 @@
 # ParallelFold
 
-Author: [Bozitao Zhong](zbztzhz@sjtu.edu.cn)
+Author: [Bozitao Zhong](mailto: zbztzhz@sjtu.edu.cn)
 
 
 
@@ -18,17 +18,7 @@ We have these following modifications to the original AlphaFold pipeline:
 
 ## How to install 
 
-First you should install AlphaFold2. You can choose one of the following methods to install AlphaFold locally.
-
-- Use [official version](https://github.com/deepmind/alphafold) from DeepMind with docker. 
-- There are some [other versions](https://github.com/kalininalab/alphafold_non_docker) install AlphaFold without docker. 
-- Also you can use [my guide](https://github.com/Zuricho/AlphaFold_local) which based on non_docker version and it can adjust to different cuda versions (cuda driver >= 10.1) 
-
-
-
-Here I recommend using local conda rather than docker.
-
-
+We recommend to install AlphaFold locally, and not install via **docker**.
 
 ### Setting up conda environment
 
@@ -125,6 +115,14 @@ give the executive permission for sh files:
 chmod +x run_feature.sh
 chmod +x run_alphafold.sh
 ```
+
+
+
+### References
+
+- [Official version](https://github.com/deepmind/alphafold) from DeepMind with docker. 
+- [None docker versions](https://github.com/kalininalab/alphafold_non_docker) install AlphaFold without docker. 
+- [My none docker guide](https://github.com/Zuricho/AlphaFold_local) adjusted to different cuda versions (cuda driver >= 10.1) 
 
 
 
