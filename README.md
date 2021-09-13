@@ -2,6 +2,12 @@
 
 Author: [Bozitao Zhong](zbztzhz@sjtu.edu.cn)
 
+
+
+Some new functions are still under development, if you want to see our update you can visit this [task board on Trello](https://trello.com/b/sAqBIxBC/parallelfold)
+
+
+
 This is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to achieve high-throughput protein structure prediction. 
 
 We have these following modifications to the original AlphaFold pipeline:
@@ -63,7 +69,7 @@ conda install -c bioconda hmmer=3.3.2 hhsuite=3.3.0 kalign2=2.04
 
 # Using pip
 pip install biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.6 immutabledict==2.0.0 jax==0.2.14 ml-collections==0.1.0
-pip install --upgrade "jax[cuda101]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+pip install --upgrade jax jaxlib==0.1.69+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 ```
 
 >  jax installation reference: https://github.com/google/jax
@@ -184,3 +190,31 @@ I have also modified `run_feature.sh` and `run_alphafold.sh` to make them find t
 
 
 If you have any question, please send your problem in issues
+
+
+
+## A fully conda based installation guide
+
+```bash
+conda create -n alphafold python=3.8
+
+conda install cudatoolkit=10.1 cudnn
+conda install tensorflow=2.3
+
+conda install -c conda-forge openmm=7.5.1 pdbfixer=1.7
+conda install -c bioconda hmmer=3.3.2 hhsuite=3.3.0 kalign2=2.04
+
+conda install -c conda-forge biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.5 immutabledict==2.0.0 jax==0.2.14 
+pip install ml-collections==0.1.0
+pip install --upgrade "jax[cuda101]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+
+
+
+```
+
+
+
+
+
+
+
