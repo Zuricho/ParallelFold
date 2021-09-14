@@ -4,11 +4,11 @@ Author: [Bozitao Zhong](mailto: zbztzhz@sjtu.edu.cn)
 
 
 
-Some new functions are still under development, if you want to see our update you can visit this [task board on Trello](https://trello.com/b/sAqBIxBC/parallelfold)
+**We are adding new functions to ParallelFold, you can see our updates from our [task board on Trello](https://trello.com/b/sAqBIxBC/parallelfold).**
 
 
 
-This is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to achieve high-throughput protein structure prediction. 
+This project is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to achieve high-throughput protein structure prediction. 
 
 We have these following modifications to the original AlphaFold pipeline:
 
@@ -18,11 +18,13 @@ We have these following modifications to the original AlphaFold pipeline:
 
 ## How to install 
 
-We recommend to install AlphaFold locally, and not install via **docker**.
+We recommend to install AlphaFold locally, and not using **docker**.
+
+
 
 ### Setting up conda environment
 
-**Step 1**: We suggest you create a conda environment for ParallelFold/AlphaFold
+**Step 1**: Create a conda environment for ParallelFold/AlphaFold
 
 ```bash
 # suppose you have miniconda environment on your cluster, or you can install another miniconda or anaconda
@@ -34,6 +36,10 @@ conda create -n alphafold python=3.8
 conda activate alphafold
 ```
 
+We recommend you to use python 3.8, python version < 3.7 may have missing packages.
+
+
+
 **Step 2**: Install `cudatoolkit` 10.1 and `cudnn`:
 
 ```bash
@@ -42,13 +48,21 @@ conda install cudatoolkit=10.1 cudnn
 
 > Why use cudatoolkit 10.1:
 >
-> - cudatoolkit supports tensorflow 2.3.0, while sometimes tensorflow can't find GPU when using cudatoolkit 10.2
+> - cudatoolkit supports TensorFlow 2.3.0, while sometimes TensorFlow can't find GPU when using cudatoolkit 10.2
+
+- cudnn version 7.6.5
+
+- For higher version of CUDA driver, you can install cudatoolkit 11.2 and TensorFlow 2.5.0 instead
+
+
 
 **Step 3**: Install tensorflow 2.3.0 by pip
 
 ```bash
 pip install tensorflow==2.3.0
 ```
+
+
 
 **Step 4**: Install other packages with pip and conda
 
@@ -63,13 +77,15 @@ pip install --upgrade jax jaxlib==0.1.69+cuda101 -f https://storage.googleapis.c
 ```
 
 >  jax installation reference: https://github.com/google/jax
-> 
-> - For CUDA 11.1, 11.2, or 11.3, use `cuda111`.
-> - For CUDA 11.0, use `cuda110`.
-> - For CUDA 10.2, use `cuda102`.
-> - For CUDA 10.1, use `cuda101`.
+>
+>  - For CUDA 11.1, 11.2, or 11.3, use `cuda111`.
+>  - For CUDA 11.0, use `cuda110`.
+>  - For CUDA 10.2, use `cuda102`.
+>  - For CUDA 10.1, use `cuda101`.
+>
+>  In newer version of JAX (after 0.1.70), it will not support CUDA 10.1 and lower version. So here we downgrade jaxlib to 0.1.69.
 
-Here you should used cuda 10.1 when you use cuda 10.1
+Here you should used cuda 10.1 when you use cuda toolkit 10.1
 
 
 
@@ -78,6 +94,13 @@ Here you should used cuda 10.1 when you use cuda 10.1
 ```bash
 git clone https://github.com/Zuricho/ParallelFold.git
 alphafold_path="/path/to/alphafold/git/repo"
+```
+
+give the executive permission for sh files:
+
+```bash
+chmod +x run_feature.sh
+chmod +x run_alphafold.sh
 ```
 
 
@@ -101,20 +124,11 @@ cd ~/.conda/envs/alphafold/lib/python3.8/site-packages/
 patch -p0 < $alphafold_path/docker/openmm.patch
 ```
 
-**[Not Necessary] If you need local cuda**
+**Local cuda**
+
+Based on our test, you need to use local cuda if you install cudatoolkit=10.1, you can skip this step if you are using cudatoolkit 11
 
 Their might be some available modules: `cuda/10.1.243-gcc-8.3.0`, `cuda/10.2.89-gcc-8.3.0`
-
-Using this kind of cuda you can skip `conda install cudatoolkit`
-
-**chmod**
-
-give the executive permission for sh files:
-
-```bash
-chmod +x run_feature.sh
-chmod +x run_alphafold.sh
-```
 
 
 
@@ -146,18 +160,16 @@ First, you need CPUs to run `run_feature.sh`:
 ```
 
 >  8 CPUs is enough, according to my test, more CPUs won't help with speed.
->
-> GPU can accelerate the hhblits step (but I think you choose this repo because GPU is expensive)
 
 Featuring step will output the `feature.pkl`  and MSA folder in your output folder: `./output/JOBNAME/`
 
-PS: Here I put my input files in an `input` folder to better organize my files, you can remove this.
+PS: Here we put input files in an `input` folder to better organize files.
 
 
 
 Second, you can run `run_alphafold.sh` using GPU:
 
-```
+```bash
 ./run_alphafold.sh -d data -o output -m model_1,model_2,model_3,model_4,model_5 -f input/test.fasta -t 2021-07-27
 ```
 
@@ -165,7 +177,7 @@ If you have successfully output `feature.pkl`, you can have a very fast featurin
 
 
 
-I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` and `sub_feature.slurm`
+~~I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` and `sub_feature.slurm`~~
 
 
 
@@ -179,36 +191,11 @@ Using ParallelFold, you can run AlphaFold 2~3 times faster than DeepMind's proce
 
 ## Other Files
 
-In `./alphafold` folder, I modified some python files (`hhblits.py`, `hmmsearch.py`, `jackhmmer.py`) , give these steps more CPUs for acceleration. But  these processes have been tested and shown to be unable to accelerate by  providing more CPU. Probably because DeepMind uses a wrapped process, I'm trying to improve it (work in progress).
-
-
-
-I have also modified `run_feature.sh` and `run_alphafold.sh` to make them find the alphafold folder, which means that you can use it in another folder. But you need to change `alphafold/common/restrains.py`. In this file it use a relative path to find the restraint file, you need to change it to absolute path.
+~~I have also modified `run_feature.sh` and `run_alphafold.sh` to make them find the alphafold folder, which means that you can use it in another folder. But you need to change `alphafold/common/restrains.py`. In this file it use a relative path to find the restraint file, you need to change it to absolute path.~~
 
 
 
 If you have any question, please send your problem in issues
-
-
-
-## A fully conda based installation guide
-
-```bash
-conda create -n alphafold python=3.8
-
-conda install cudatoolkit=10.1 cudnn
-conda install tensorflow=2.3
-
-conda install -c conda-forge openmm=7.5.1 pdbfixer=1.7
-conda install -c bioconda hmmer=3.3.2 hhsuite=3.3.0 kalign2=2.04
-
-conda install -c conda-forge biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.5 immutabledict==2.0.0 jax==0.2.14 
-pip install ml-collections==0.1.0
-pip install --upgrade "jax[cuda101]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
-
-
-
-```
 
 
 
