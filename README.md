@@ -177,6 +177,18 @@ If you have successfully output `feature.pkl`, you can have a very fast featurin
 
 
 
+## Functions
+
+You can using some flags to change prediction model for ParallelFold:
+
+`-r`: Skip AMBER refinement
+
+`-b`: Using benchmark mode - running JAX model for twice, and the second run can used for evaluate running time
+
+**Some more functions are under development.**
+
+
+
 ~~I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` and `sub_feature.slurm`~~
 
 
