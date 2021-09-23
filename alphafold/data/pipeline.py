@@ -156,6 +156,10 @@ class DataPipeline:
     mgnify_msa, mgnify_deletion_matrix, _ = parsers.parse_stockholm(
         jackhmmer_mgnify_result['sto'])
     hhsearch_hits = parsers.parse_hhr(hhsearch_result)
+
+    uniref90_msa = uniref90_msa[:self.uniref_max_hits]
+    uniref90_deletion_matrix = uniref90_deletion_matrix[:self.uniref_max_hits]
+
     mgnify_msa = mgnify_msa[:self.mgnify_max_hits]
     mgnify_deletion_matrix = mgnify_deletion_matrix[:self.mgnify_max_hits]
 
