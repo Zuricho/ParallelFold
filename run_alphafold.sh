@@ -18,12 +18,12 @@ usage() {
         echo "-g <use_gpu>      Enable NVIDIA runtime to run with GPUs (default: 'True')"
         echo "-a <gpu_devices>  Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
         echo "-p <preset>       Choose preset model configuration - no ensembling (full_dbs) or 8 model ensemblings (casp14) (default: 'full_dbs')"\
-        echo "-r <amber_relax>  Skip AMBER refinemet for predicted structure (default: 'True')"
+        echo "-x <amber_relax>  Skip AMBER refinemet for predicted structure (default: 'True')"
         echo ""
         exit 1
 }
 
-while getopts ":d:o:m:f:t:a:p:bgr" i; do
+while getopts ":d:o:m:f:t:a:p:bgx" i; do
         case "${i}" in
         d)
                 data_dir=$OPTARG
@@ -52,7 +52,7 @@ while getopts ":d:o:m:f:t:a:p:bgr" i; do
         p)
                 preset=$OPTARG
         ;;
-        r)
+        x)
                 amber_relaxation=false
         ;;
         esac

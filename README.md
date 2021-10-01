@@ -148,6 +148,7 @@ Their might be some available modules: `cuda/10.1.243-gcc-8.3.0`, `cuda/10.2.89-
 - `run_alphaold.sh`: bash script to run `run_alphafold.py`
 - `run_feature.py`: modified version of original `run_alphafold.py`, it exit python process after finished writing `feature.pkl`
 - `run_feature.sh`: bash scripts to run `run_feature.py`
+- `run_figure`: this file can help you make figure for your system
 
 
 
@@ -177,11 +178,21 @@ If you have successfully output `feature.pkl`, you can have a very fast featurin
 
 
 
+Finally, you can run `run_figure.py` to visualize your result:
+
+```
+python run_figure.py [SystemName]
+```
+
+This python file will create a figure folder in your output folder
+
+
+
 ## Functions
 
 You can using some flags to change prediction model for ParallelFold:
 
-`-r`: Skip AMBER refinement
+`-x`: Skip AMBER refinement
 
 `-b`: Using benchmark mode - running JAX model for twice, and the second run can used for evaluate running time
 
