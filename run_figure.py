@@ -109,7 +109,7 @@ def pae_figure(pae_mat,system_name,model_name):
     plt.title("Predicted Aligned Error of %s %s"%(system_name,model_name))
     plt.xlabel("scored residue")
     plt.ylabel("aligned residue")
-    plt.colorbar(label="Expected positional error (Å)",shrink=0.8)
+    plt.colorbar(label="Expected positional error (Angstrom)",shrink=0.8)
     plt.savefig("figure/PAE_%s.png"%model_name,dpi=200)
 
 
