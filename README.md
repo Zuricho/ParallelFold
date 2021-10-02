@@ -184,7 +184,9 @@ Finally, you can run `run_figure.py` to visualize your result:
 python run_figure.py [SystemName]
 ```
 
-This python file will create a figure folder in your output folder
+This python file will create a figure folder in your output folder.
+
+Notice: `run_figure.py` need a local conda environment with matplotlib, pymol and numpy.
 
 
 

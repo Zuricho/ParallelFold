@@ -72,7 +72,7 @@ def secondary_figure(ss_total_list,system_name,model_name_list,mode="normal"):
 
 # Get Target Secondary Structure
 def get_secondary_sturcture(system_name,model_name):
-    # Helix is 1, Sheet is 2, Loop is 0
+    # Helix is 1, Sheet is -1, Loop is 0
     ss_list = []
     # two types of models
     if os.path.exists("unrelaxed_%s.pdb"%model_name):
@@ -82,7 +82,7 @@ def get_secondary_sturcture(system_name,model_name):
             if a.ss == 'H':
                 ss_list.append(1)
             elif a.ss == 'S':
-                ss_list.append(2)
+                ss_list.append(-1)
             else:
                 ss_list.append(0)
         cmd.reinitialize()
@@ -148,10 +148,12 @@ def main():
 
             pkl_file.close()
 
-    plddt_figure(plddt_score_list,system_name,model_normal_list)
-    plddt_figure(plddt_score_list_ptm,system_name,model_ptm_list,mode='ptm')
-    secondary_figure(ss_normal_list,system_name,model_normal_list)
-    secondary_figure(ss_ptm_list,system_name,model_ptm_list,mode="ptm")
+    if len(model_normal_list) != 0:
+        plddt_figure(plddt_score_list,system_name,model_normal_list)
+        secondary_figure(ss_normal_list,system_name,model_normal_list)
+    if len(model_ptm_list) != 0:
+        plddt_figure(plddt_score_list_ptm,system_name,model_ptm_list,mode='ptm')
+        secondary_figure(ss_ptm_list,system_name,model_ptm_list,mode="ptm")
 
     
         
