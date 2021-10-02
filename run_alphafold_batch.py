@@ -171,9 +171,9 @@ def predict_structure_batch(
       t_0 = time.time()
       prediction_result_list.append(model_runner.predict(processed_feature_dict_list[i]))
       t_diff = time.time() - t_0
-      timings[f'predict_{model_name}'] = t_diff
+      timings[f'predict_{model_name}_{fasta_names[i]}'] = t_diff
       logging.info(
-          'Total JAX model %s predict time: %.0f?',
+          'Total JAX model %s predict time: %.0fs',
           model_name, t_diff)
     
     # run prediction analyse batch 
