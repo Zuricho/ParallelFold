@@ -715,8 +715,12 @@ def _process_single_hit(
   logging.info('Reading PDB entry from %s. Query: %s, template: %s',
                cif_path, query_sequence, template_sequence)
   # Fail if we can't find the mmCIF file.
-  with open(cif_path, 'r') as cif_file:
-    cif_string = cif_file.read()
+  try:
+    with open(cif_path, 'r') as cif_file:
+      cif_string = cif_file.read()
+  except FileNotFoundError:
+    logging.info('Cannot found entry %s',cif_path)
+    return SingleHitResult(features=None, error=None, warning=None)
 
   parsing_result = mmcif_parsing.parse(
       file_id=hit_pdb_code, mmcif_string=cif_string)
