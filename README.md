@@ -8,7 +8,7 @@ Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
 
 
-
+**ParallelFold now supports AlphaFold 2.1.1 (maybe we are the first to adapt to multimer version)**
 
 This project is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to achieve high-throughput protein structure prediction. 
 
