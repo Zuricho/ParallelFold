@@ -55,7 +55,7 @@ flags.DEFINE_list(
     'specifying true where the target complex is from a prokaryote, and false '
     'where it is not, or where the origin is unknown. These values determine '
     'the pairing method for the MSA.')
-
+flags.DEFINE_list('model_names', None, 'Names of models to use.')
 flags.DEFINE_string('data_dir', None, 'Path to directory of supporting data.')
 flags.DEFINE_string('output_dir', None, 'Path to a directory that will '
                     'store the results.')
@@ -116,6 +116,9 @@ flags.DEFINE_integer('random_seed', None, 'The random seed for the data '
 flags.DEFINE_boolean('use_precomputed_msas', False, 'Whether to read MSAs that '
                      'have been written to disk. WARNING: This will not check '
                      'if the sequence, database or configuration have changed.')
+flags.DEFINE_boolean('amber_relaxation', True, 'Use AMBER force field to relax '
+                     'predicted protein structure, default is True.')
+flags.DEFINE_integer('recycling', 3, 'Set number of recyclings')
 
 FLAGS = flags.FLAGS
 
@@ -158,21 +161,29 @@ def predict_structure(
 
   # Get features.
   t_0 = time.time()
-  if is_prokaryote is None:
-    feature_dict = data_pipeline.process(
-        input_fasta_path=fasta_path,
-        msa_output_dir=msa_output_dir)
-  else:
-    feature_dict = data_pipeline.process(
-        input_fasta_path=fasta_path,
-        msa_output_dir=msa_output_dir,
-        is_prokaryote=is_prokaryote)
-  timings['features'] = time.time() - t_0
-
-  # Write out features as a pickled dictionary.
   features_output_path = os.path.join(output_dir, 'features.pkl')
-  with open(features_output_path, 'wb') as f:
-    pickle.dump(feature_dict, f, protocol=4)
+  
+  # If we already have feature.pkl file, skip the MSA and template finding step
+  if os.path.exists(features_output_path):
+    feature_dict = pickle.load(open(features_output_path, 'rb'))
+  
+  else:
+    if is_prokaryote is None:
+      feature_dict = data_pipeline.process(
+          input_fasta_path=fasta_path,
+          msa_output_dir=msa_output_dir)
+    else:
+      feature_dict = data_pipeline.process(
+          input_fasta_path=fasta_path,
+          msa_output_dir=msa_output_dir,
+          is_prokaryote=is_prokaryote)
+  
+    # Write out features as a pickled dictionary.
+    features_output_path = os.path.join(output_dir, 'features.pkl')
+    with open(features_output_path, 'wb') as f:
+      pickle.dump(feature_dict, f, protocol=4)
+
+  timings['features'] = time.time() - t_0
 
   unrelaxed_pdbs = {}
   relaxed_pdbs = {}
@@ -368,8 +379,14 @@ def main(argv):
   else:
     data_pipeline = monomer_data_pipeline
 
+  config.data.common.num_recycle = FLAGS.recycling
+  config.model.num_recycle = FLAGS.recycling
+
   model_runners = {}
-  model_names = config.MODEL_PRESETS[FLAGS.model_preset]
+  if FLAGS.model_names:
+    model_names = FLAGS.model_names
+  else:
+    model_names = config.MODEL_PRESETS[FLAGS.model_preset]
   for model_name in model_names:
     model_config = config.model_config(model_name)
     if run_multimer_system:
@@ -384,12 +401,15 @@ def main(argv):
   logging.info('Have %d models: %s', len(model_runners),
                list(model_runners.keys()))
 
-  amber_relaxer = relax.AmberRelaxation(
-      max_iterations=RELAX_MAX_ITERATIONS,
-      tolerance=RELAX_ENERGY_TOLERANCE,
-      stiffness=RELAX_STIFFNESS,
-      exclude_residues=RELAX_EXCLUDE_RESIDUES,
-      max_outer_iterations=RELAX_MAX_OUTER_ITERATIONS)
+  if FLAGS.amber_relaxation == True:
+    amber_relaxer = relax.AmberRelaxation(
+        max_iterations=RELAX_MAX_ITERATIONS,
+        tolerance=RELAX_ENERGY_TOLERANCE,
+        stiffness=RELAX_STIFFNESS,
+        exclude_residues=RELAX_EXCLUDE_RESIDUES,
+        max_outer_iterations=RELAX_MAX_OUTER_ITERATIONS)
+  else:
+    amber_relaxer=False
 
   random_seed = FLAGS.random_seed
   if random_seed is None:
@@ -410,6 +430,7 @@ def main(argv):
         benchmark=FLAGS.benchmark,
         random_seed=random_seed,
         is_prokaryote=is_prokaryote)
+    logging.info('%s AlphaFold structure prediction COMPLETE', fasta_name)
 
 
 if __name__ == '__main__':

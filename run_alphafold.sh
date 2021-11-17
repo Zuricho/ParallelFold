@@ -7,25 +7,28 @@ usage() {
         echo ""
         echo "Usage: $0 <OPTIONS>"
         echo "Required Parameters:"
-        echo "-d <data_dir>          Path to directory of supporting data"
-        echo "-o <output_dir>        Path to a directory that will store the results."
-        echo "-p <model_preset>      Model preset. Use monomer, monomer_ptm, monomer_casp14 or multimer models"
-        echo "-f <fasta_path>        Path to a FASTA file containing one sequence"
+        echo "-d <data_dir>           Path to directory of supporting data"
+        echo "-o <output_dir>         Path to a directory that will store the results."
+        echo "-p <model_preset>       Model preset. Use monomer, monomer_ptm, monomer_casp14 or multimer models"
+        echo "-f <fasta_path>         Path to a FASTA file containing query sequence(s)"
 
         echo "Optional Parameters:"
-        echo "-t <max_template_date> Maximum template release date to consider (YYYY-MM-DD format). (default: 2020-12-01)"
-        echo "-b <benchmark>         Run multiple JAX model evaluations to obtain a timing that excludes the compilation time (default: 'False')"
-        echo "-g <use_gpu>           Enable NVIDIA runtime to run with GPUs (default: 'True')"
-        echo "-u <gpu_devices>       Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
-        echo "-c <db_preset>         Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
-
+        echo "-t <max_template_date>  Maximum template release date to consider (YYYY-MM-DD format). (default: 2020-12-01)"
+        echo "-b <benchmark>          Run multiple JAX model evaluations to obtain a timing that excludes the compilation time (default: 'False')"
+        echo "-g <use_gpu>            Enable NVIDIA runtime to run with GPUs (default: 'True')"
+        echo "-u <gpu_devices>        Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
+        echo "-c <db_preset>          Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
+        echo "-a <amber_relaxation>   Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
+        echo "-m <model_selection>    Names of comma separated model names to use in prediction (default: All 5 models)"
+        
         echo "Future Parameters (You cannot use them now):"
-        echo "-a <amber_relax>       Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
-        echo "-m <model_selection>   Names of comma separated model names to use in prediction (default: All 5 models)"
-        echo "-v <visualizaion>      Automatic visualizaion of MSA, pLDDT, pTM of prediction results"
-        echo "-s <skip_msa>          Skip MSA and template step, generate single sequence feature for ultimately fast prediction"
-        echo "-q <quick_mode>        Quick mode. Use small BFD database, no templates"
-        echo "-r <recycling>         Set cycles for recycling (default: '3')"
+        echo "-v <visualizaion>       Automatic visualizaion of MSA, pLDDT, pTM of prediction results"
+        echo "-s <skip_msa>           Skip MSA and template step, generate single sequence feature for ultimately fast prediction"
+        echo "-q <quick_mode>         Quick mode. Use small BFD database, no templates"
+        echo "-r <recycling>          Set cycles for recycling (default: '3')"
+        echo "-k <is_prokaryote_list> Optional for multimer system, specifying true where the target complex is from a prokaryote"
+        echo "-e <random_seed>        Set random seed"
+        echo "-l <precomputed_msas>   Use precomputed MSAs"
         echo ""
         exit 1
 }
@@ -110,7 +113,7 @@ if [[ "$amber_relaxation" == "" ]] ; then
 fi
 
 if [[ "$model_selection" == "" ]] ; then
-    model_selection="model_1,model_2,model_3,model_4,model_5"
+    model_selection=""
 fi
 
 if [[ "$visualizaion" == "" ]] ; then
@@ -191,6 +194,7 @@ fi
 # Run AlphaFold with required parameters
 python $alphafold_script \
 --fasta_paths=$fasta_path \
+--model_names=$model_selection \
 --data_dir=$data_dir \
 --output_dir=$output_dir \
 --jackhmmer_binary_path=$jackhmmer_binary_path \
@@ -213,4 +217,6 @@ python $alphafold_script \
 --db_preset=$db_preset \
 --model_preset=$model_preset \
 --benchmark=$benchmark \
+--amber_relaxation=$amber_relaxation \
+--recycling=$recycling \
 --logtostderr
