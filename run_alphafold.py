@@ -379,9 +379,6 @@ def main(argv):
   else:
     data_pipeline = monomer_data_pipeline
 
-  config.data.common.num_recycle = FLAGS.recycling
-  config.model.num_recycle = FLAGS.recycling
-
   model_runners = {}
   if FLAGS.model_names:
     model_names = FLAGS.model_names
@@ -391,8 +388,11 @@ def main(argv):
     model_config = config.model_config(model_name)
     if run_multimer_system:
       model_config.model.num_ensemble_eval = num_ensemble
+      model_config.model.num_recycle = FLAGS.recycling
     else:
       model_config.data.eval.num_ensemble = num_ensemble
+      model_config.model.num_recycle = FLAGS.recycling
+      model_config.data.common.num_recycle = FLAGS.recycling
     model_params = data.get_model_haiku_params(
         model_name=model_name, data_dir=FLAGS.data_dir)
     model_runner = model.RunModel(model_config, model_params)
