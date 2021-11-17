@@ -4,7 +4,7 @@ Author: [Bozitao Zhong](mailto: zbztzhz@sjtu.edu.cn)
 
 
 
-**We are adding new functions to ParallelFold, you can see our updates from our [task board on Trello](https://trello.com/b/sAqBIxBC/parallelfold).**
+==We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).==
 
 
 
