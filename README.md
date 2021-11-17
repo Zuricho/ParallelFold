@@ -6,8 +6,6 @@ Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
 :bookmark_tabs: Please cite our [Arxiv paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research.
 
----
-
 
 
 
