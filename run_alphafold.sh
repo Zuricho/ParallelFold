@@ -7,22 +7,30 @@ usage() {
         echo ""
         echo "Usage: $0 <OPTIONS>"
         echo "Required Parameters:"
-        echo "-d <data_dir>     Path to directory of supporting data"
-        echo "-o <output_dir>   Path to a directory that will store the results."
-        echo "-m <mode>         Moldel preset. Use monomer, monomer_ptm or multimer models (default contain all 5 models)"
-        echo "-f <fasta_path>   Path to a FASTA file containing one sequence"
-        echo "-t <max_template_date> Maximum template release date to consider (ISO-8601 format - i.e. YYYY-MM-DD). Important if folding historical test sets"
+        echo "-d <data_dir>          Path to directory of supporting data"
+        echo "-o <output_dir>        Path to a directory that will store the results."
+        echo "-p <model_preset>      Model preset. Use monomer, monomer_ptm, monomer_casp14 or multimer models"
+        echo "-f <fasta_path>        Path to a FASTA file containing one sequence"
+
         echo "Optional Parameters:"
-        echo "-b <benchmark>    Run multiple JAX model evaluations to obtain a timing that excludes the compilation time (default: 'False')"
-        echo "-g <use_gpu>      Enable NVIDIA runtime to run with GPUs (default: 'True')"
-        echo "-a <gpu_devices>  Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
-        echo "-p <db_preset>       Choose database preset model configuration - no ensembling (full_dbs) or 8 model ensemblings (casp14) (default: 'full_dbs')"\
-        echo "-r <amber_relax>  Skip AMBER refinemet for predicted structure (default: 'True')"
+        echo "-t <max_template_date> Maximum template release date to consider (YYYY-MM-DD format). (default: 2020-12-01)"
+        echo "-b <benchmark>         Run multiple JAX model evaluations to obtain a timing that excludes the compilation time (default: 'False')"
+        echo "-g <use_gpu>           Enable NVIDIA runtime to run with GPUs (default: 'True')"
+        echo "-u <gpu_devices>       Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
+        echo "-c <db_preset>         Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
+
+        echo "Future Parameters (You cannot use them now):"
+        echo "-a <amber_relax>       Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
+        echo "-m <model_selection>   Names of comma separated model names to use in prediction (default: All 5 models)"
+        echo "-v <visualizaion>      Automatic visualizaion of MSA, pLDDT, pTM of prediction results"
+        echo "-s <skip_msa>          Skip MSA and template step, generate single sequence feature for ultimately fast prediction"
+        echo "-q <quick_mode>        Quick mode. Use small BFD database, no templates"
+        echo "-r <recycling>         Set cycles for recycling (default: '3')"
         echo ""
         exit 1
 }
 
-while getopts ":d:o:m:f:t:a:p:bgr" i; do
+while getopts ":d:o:p:f:t:u:c:m:r:bgravsq" i; do
         case "${i}" in
         d)
                 data_dir=$OPTARG
@@ -30,7 +38,7 @@ while getopts ":d:o:m:f:t:a:p:bgr" i; do
         o)
                 output_dir=$OPTARG
         ;;
-        m)
+        p)
                 model_preset=$OPTARG
         ;;
         f)
@@ -45,14 +53,29 @@ while getopts ":d:o:m:f:t:a:p:bgr" i; do
         g)
                 use_gpu=true
         ;;
-        a)
+        u)
                 gpu_devices=$OPTARG
         ;;
-        p)
+        c)
                 db_preset=$OPTARG
         ;;
-        r)
+        a)
                 amber_relaxation=false
+        ;;
+        m)
+                model_selection=$OPTARG
+        ;;
+        v)
+                visualizaion=true
+        ;;
+        s)
+                skip_msa=true
+        ;;
+        q)
+                quick_mode=true
+        ;;
+        r)
+                recycling=$OPTARG
         ;;
         esac
 done
@@ -63,7 +86,7 @@ if [[ "$data_dir" == "" || "$output_dir" == "" || "$model_preset" == "" || "$fas
 fi
 
 if [[ "$max_template_date" == "" ]] ; then
-    max_template_date=None
+    max_template_date="2020-12-01"
 fi
 
 if [[ "$benchmark" == "" ]] ; then
@@ -82,13 +105,28 @@ if [[ "$db_preset" == "" ]] ; then
     db_preset="full_dbs"
 fi
 
-if [[ "$db_preset" != "full_dbs" && "$db_preset" != "casp14" ]] ; then
-    echo "Unknown preset! Using default ('full_dbs')"
-    db_preset="full_dbs"
-fi
-
 if [[ "$amber_relaxation" == "" ]] ; then
     amber_relaxation=true
+fi
+
+if [[ "$model_selection" == "" ]] ; then
+    model_selection="model_1,model_2,model_3,model_4,model_5"
+fi
+
+if [[ "$visualizaion" == "" ]] ; then
+    visualizaion=false
+fi
+
+if [[ "$skip_msa" == "" ]] ; then
+    skip_msa=false
+fi
+
+if [[ "$quick_mode" == "" ]] ; then
+    quick_mode=false
+fi
+
+if [[ "$recycling" == "" ]] ; then
+    recycling=3
 fi
 
 # This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits

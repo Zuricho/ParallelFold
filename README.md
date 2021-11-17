@@ -1,10 +1,12 @@
 # ParallelFold
 
-Author: [Bozitao Zhong](mailto: zbztzhz@sjtu.edu.cn)
+Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
 
 
-==We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).==
+:station: We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).
+
+:bookmark_tabs: Please cite our [Arxiv paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research.
 
 
 
@@ -70,6 +72,7 @@ pip install tensorflow==2.3.0
 # Using conda
 conda install -c conda-forge openmm=7.5.1 pdbfixer=1.7
 conda install -c bioconda hmmer=3.3.2 hhsuite=3.3.0 kalign2=2.04
+conda install pandas=1.3.4
 
 # Using pip
 pip install biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.6 immutabledict==2.0.0 jax==0.2.14 ml-collections==0.1.0
