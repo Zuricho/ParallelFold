@@ -1,6 +1,12 @@
 # ParallelFold
 
-![logo](figure/parafoldlogo.png)
+![logo](figure/parafoldlogo.png =x400)
+
+<div align=center>
+< img src="./figure/parafoldlogo.png" width="180" >
+</div>
+
+
 
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
