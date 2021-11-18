@@ -1,9 +1,7 @@
 # ParallelFold
 
-![logo](figure/parafoldlogo.png =x400)
-
 <div align=center>
-< img src="./figure/parafoldlogo.png" width="180" >
+<img src="./figure/parafoldlogo.png" width="180" >
 </div>
 
 
