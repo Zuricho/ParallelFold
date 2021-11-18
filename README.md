@@ -1,6 +1,6 @@
 # ParallelFold
 
-<img src="figure/parafoldlogo.png" alt="parafoldlogo"  />
+![logo](figure/parafoldlogo.png)
 
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
