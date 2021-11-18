@@ -1,10 +1,12 @@
 # ParallelFold
 
+<img src="figure/parafoldlogo.png" alt="parafoldlogo" style="zoom: 33%;" />
+
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
 :station: We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).
 
-:bookmark_tabs: Please cite our [Arxiv paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research.
+:bookmark_tabs: Please cite our [Arxiv paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research. 
 
 
 
