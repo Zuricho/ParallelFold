@@ -145,7 +145,7 @@ fi
 # This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits
 #current_working_dir=$(pwd)
 #alphafold_script="$current_working_dir/run_alphafold.py"
-alphafold_script="$(readlink -f $(dirname $0))/run_alphafold_new.py"  
+alphafold_script="$(readlink -f $(dirname $0))/run_alphafold.py"  
 
 
 if [ ! -f "$alphafold_script" ]; then
