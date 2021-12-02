@@ -10,7 +10,7 @@ usage() {
         echo "-d <data_dir>           Path to directory of supporting data"
         echo "-o <output_dir>         Path to a directory that will store the results."
         echo "-p <model_preset>       Model preset. Use monomer, monomer_ptm, monomer_casp14 or multimer models"
-        echo "-f <fasta_path>         Path to a FASTA file containing query sequence(s)"
+        echo "-i <fasta_path>         Path to a FASTA file containing query sequence(s)"
 
         echo "Optional Parameters:"
         echo "-t <max_template_date>  Maximum template release date to consider (YYYY-MM-DD format). (default: 2020-12-01)"
@@ -20,12 +20,13 @@ usage() {
         echo "-c <db_preset>          Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
         echo "-a <amber_relaxation>   Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
         echo "-m <model_selection>    Names of comma separated model names to use in prediction (default: All 5 models)"
+        echo "-r <recycling>          Set cycles for recycling (default: '3')"
+        echo "-f <run_feature>        Only run MSA and template search to generate feature file"
         
         echo "Future Parameters (You cannot use them now):"
         echo "-v <visualizaion>       Automatic visualizaion of MSA, pLDDT, pTM of prediction results"
         echo "-s <skip_msa>           Skip MSA and template step, generate single sequence feature for ultimately fast prediction"
         echo "-q <quick_mode>         Quick mode. Use small BFD database, no templates"
-        echo "-r <recycling>          Set cycles for recycling (default: '3')"
         echo "-k <is_prokaryote_list> Optional for multimer system, specifying true where the target complex is from a prokaryote"
         echo "-e <random_seed>        Set random seed"
         echo "-l <precomputed_msas>   Use precomputed MSAs"
@@ -33,7 +34,7 @@ usage() {
         exit 1
 }
 
-while getopts ":d:o:p:f:t:u:c:m:r:bgravsq" i; do
+while getopts ":d:o:p:i:t:u:c:m:r:bgravsqf" i; do
         case "${i}" in
         d)
                 data_dir=$OPTARG
@@ -44,7 +45,7 @@ while getopts ":d:o:p:f:t:u:c:m:r:bgravsq" i; do
         p)
                 model_preset=$OPTARG
         ;;
-        f)
+        i)
                 fasta_path=$OPTARG
         ;;
         t)
@@ -79,6 +80,9 @@ while getopts ":d:o:p:f:t:u:c:m:r:bgravsq" i; do
         ;;
         r)
                 recycling=$OPTARG
+        ;;
+        f)
+                run_feature=true
         ;;
         esac
 done
@@ -132,10 +136,16 @@ if [[ "$recycling" == "" ]] ; then
     recycling=3
 fi
 
+if [[ "$run_feature" == "" ]] ; then
+    run_feature=false
+fi
+
+
+
 # This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits
 #current_working_dir=$(pwd)
 #alphafold_script="$current_working_dir/run_alphafold.py"
-alphafold_script="$(readlink -f $(dirname $0))/run_alphafold.py"  
+alphafold_script="$(readlink -f $(dirname $0))/run_alphafold_new.py"  
 
 
 if [ ! -f "$alphafold_script" ]; then
@@ -219,4 +229,5 @@ python $alphafold_script \
 --benchmark=$benchmark \
 --amber_relaxation=$amber_relaxation \
 --recycling=$recycling \
+--run_feature=$run_feature \
 --logtostderr

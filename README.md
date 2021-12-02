@@ -3,25 +3,21 @@
 <div align=center>
 <img src="./figure/parafoldlogo.png" width="400" >
 </div>
-
-
-
-
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
 :station: We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).
 
 :bookmark_tabs: Please cite our [Arxiv paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research. 
 
-
-
-**ParallelFold now supports AlphaFold 2.1.1 (maybe we are the first to adapt to multimer version)**
+## Overview
 
 This project is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to achieve high-throughput protein structure prediction. 
 
 We have these following modifications to the original AlphaFold pipeline:
 
 - Divide **CPU part** (MSA and template searching) and **GPU part** (prediction model)
+
+**ParallelFold now supports AlphaFold 2.1.1**
 
 
 
@@ -154,41 +150,41 @@ Their might be some available modules: `cuda/10.1.243-gcc-8.3.0`, `cuda/10.2.89-
 
 4 files:
 
-- `run_alphafold.py`: modified version of original `run_alphafold.py`, it skips featuring steps when there exists `feature.pkl` in output folder
-- `run_alphaold.sh`: bash script to run `run_alphafold.py`
-- `run_feature.py`: modified version of original `run_alphafold.py`, it exit python process after finished writing `feature.pkl`
-- `run_feature.sh`: bash scripts to run `run_feature.py`
+- `run_alphafold.py`: modified version of original `run_alphafold.py`, it has multiple additional functions like skipping featuring steps when exists `feature.pkl` in output folder
+- `run_alphafold.sh`: bash script to run `run_alphafold.py`
 - `run_figure`: this file can help you make figure for your system
 
 
 
 ## How to run
 
-First, you need CPUs to run `run_feature.sh`:
+First, you need CPUs to run get features:
 
 ```bash
-./run_feature.sh -d data -o output -m model_1 -f input/test3.fasta -t 2021-07-27
+./run_alphafold.sh -d data -o output -p monomer_ptm -i input/test.fasta -t 2021-07-27 -m model_1 -f
 ```
 
->  8 CPUs is enough, according to my test, more CPUs won't help with speed.
+`-f` means only run the featurization step, result in a `feature.pkl` file, and skip the following steps.
 
-Featuring step will output the `feature.pkl`  and MSA folder in your output folder: `./output/JOBNAME/`
+>  8 CPUs is enough, according to my test, more CPUs won't help with speed
 
-PS: Here we put input files in an `input` folder to better organize files.
+Featuring step will output the `feature.pkl`  and MSA folder in your output folder: `./output/FASTA_NAME/`
+
+PS: Here we put input files in an `input` folder to organize files in a better way.
 
 
 
 Second, you can run `run_alphafold.sh` using GPU:
 
 ```bash
-./run_alphafold.sh -d data -o output -m model_1,model_2,model_3,model_4,model_5 -f input/test.fasta -t 2021-07-27
+./run_alphafold.sh -d data -o output -m model_1,model_2,model_3,model_4,model_5 -i input/test.fasta -t 2021-07-27
 ```
 
 If you have successfully output `feature.pkl`, you can have a very fast featuring step
 
 
 
-Finally, you can run `run_figure.py` to visualize your result:
+Finally, you can run `run_figure.py` to visualize your result: [This will be available soon]
 
 ```
 python run_figure.py [SystemName]
@@ -208,11 +204,9 @@ You can using some flags to change prediction model for ParallelFold:
 
 `-b`: Using benchmark mode - running JAX model for twice, and the second run can used for evaluate running time
 
+`-r`: Change the number of cycles in recycling
+
 **Some more functions are under development.**
-
-
-
-~~I have also upload my scripts in SJTU HPC (using slurm): `sub_alphafold.slurm` and `sub_feature.slurm`~~
 
 
 
@@ -224,13 +218,7 @@ Using ParallelFold, you can run AlphaFold 2~3 times faster than DeepMind's proce
 
 
 
-## Other Files
-
-~~I have also modified `run_feature.sh` and `run_alphafold.sh` to make them find the alphafold folder, which means that you can use it in another folder. But you need to change `alphafold/common/restrains.py`. In this file it use a relative path to find the restraint file, you need to change it to absolute path.~~
-
-
-
-If you have any question, please send your problem in issues
+**If you have any question, please send your problem in issues**
 
 
 

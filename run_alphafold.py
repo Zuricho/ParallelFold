@@ -119,6 +119,8 @@ flags.DEFINE_boolean('use_precomputed_msas', False, 'Whether to read MSAs that '
 flags.DEFINE_boolean('amber_relaxation', True, 'Use AMBER force field to relax '
                      'predicted protein structure, default is True.')
 flags.DEFINE_integer('recycling', 3, 'Set number of recyclings')
+flags.DEFINE_boolean('run_feature', False, 'Calculate MSA and template to generate '
+                     'feature')
 
 FLAGS = flags.FLAGS
 
@@ -148,6 +150,7 @@ def predict_structure(
     amber_relaxer: relax.AmberRelaxation,
     benchmark: bool,
     random_seed: int,
+    run_feature: bool,
     is_prokaryote: Optional[bool] = None):
   """Predicts structure using AlphaFold for the given sequence."""
   logging.info('Predicting %s', fasta_name)
@@ -184,6 +187,9 @@ def predict_structure(
       pickle.dump(feature_dict, f, protocol=4)
 
   timings['features'] = time.time() - t_0
+  
+  if run_feature:
+    sys.exit(0)
 
   unrelaxed_pdbs = {}
   relaxed_pdbs = {}
@@ -429,7 +435,8 @@ def main(argv):
         amber_relaxer=amber_relaxer,
         benchmark=FLAGS.benchmark,
         random_seed=random_seed,
-        is_prokaryote=is_prokaryote)
+        is_prokaryote=is_prokaryote,
+        run_feature = FLAGS.run_feature)
     logging.info('%s AlphaFold structure prediction COMPLETE', fasta_name)
 
 
