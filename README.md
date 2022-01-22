@@ -105,7 +105,6 @@ alphafold_path="/path/to/alphafold/git/repo"
 give the executive permission for sh files:
 
 ```bash
-chmod +x run_feature.sh
 chmod +x run_alphafold.sh
 ```
 
