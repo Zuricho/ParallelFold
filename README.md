@@ -3,11 +3,12 @@
 <div align=center>
 <img src="./figure/parafoldlogo.png" width="400" >
 </div>
+
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
 
 :station: We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).
 
-:bookmark_tabs: Please cite our [Arxiv paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research. 
+:bookmark_tabs: Please cite our [paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research. 
 
 ## Overview
 
@@ -17,7 +18,7 @@ We have these following modifications to the original AlphaFold pipeline:
 
 - Divide **CPU part** (MSA and template searching) and **GPU part** (prediction model)
 
-**ParallelFold now supports AlphaFold 2.1.1**
+**ParallelFold now supports AlphaFold 2.1.2**
 
 
 
@@ -32,10 +33,6 @@ We recommend to install AlphaFold locally, and not using **docker**.
 **Step 1**: Create a conda environment for ParallelFold/AlphaFold
 
 ```bash
-# suppose you have miniconda environment on your cluster, or you can install another miniconda or anaconda
-module load miniconda3
-source activate base
-
 # Create a miniconda environment for ParallelFold/AlphaFold
 conda create -n alphafold python=3.8
 conda activate alphafold
@@ -49,15 +46,14 @@ We recommend you to use python 3.8, python version < 3.7 may have missing packag
 
 ```bash
 conda install cudatoolkit=10.1 cudnn
+# conda install cudatoolkit=11.3 cudnn
 ```
 
-> Why use cudatoolkit 10.1:
->
-> - cudatoolkit supports TensorFlow 2.3.0, while sometimes TensorFlow can't find GPU when using cudatoolkit 10.2
-
-- cudnn version 7.6.5
-
-- For higher version of CUDA driver, you can install cudatoolkit 11.2 and TensorFlow 2.5.0 instead
+> - cudatoolkit 10.1 matches cudnn 7.6.5, supports TensorFlow 2.3.0
+>   - cudatoolkit supports TensorFlow 2.3.0, while sometimes TensorFlow can't find GPU when using cudatoolkit 10.2
+> 
+> - cudatoolkit 11.3 matches cudnn 8.2.1
+> - For higher version of CUDA driver, you can install cudatoolkit 11.2 and TensorFlow 2.5.0 instead
 
 
 
@@ -80,6 +76,8 @@ conda install pandas=1.3.4
 # Using pip
 pip install biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.6 immutabledict==2.0.0 jax==0.2.14 ml-collections==0.1.0
 pip install --upgrade jax jaxlib==0.1.69+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
+# pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
+
 ```
 
 >  jax installation reference: https://github.com/google/jax
@@ -126,7 +124,7 @@ wget -q -P alphafold/alphafold/common/ https://git.scicore.unibas.ch/schwede/ope
 # This is you path to your alphafold folder
 alphafold_path="/path/to/alphafold/git/repo"
 cd ~/.conda/envs/alphafold/lib/python3.8/site-packages/
-patch -p0 < $alphafold_path/docker/openmm.patch
+patch -p0 < $alphafold_path/setup/openmm.patch
 ```
 
 **Local cuda**

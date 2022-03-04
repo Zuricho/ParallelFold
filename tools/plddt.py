@@ -15,7 +15,6 @@ try:
         print('\n',end="")
         pkl_file.close()
     else:
-        print("aaa")
         print("Usage: python3 plddt.py [AlphaFold predict output plddt file]\n")
 except:
     print("Usage: python3 plddt.py [AlphaFold predict output plddt file]\n")
