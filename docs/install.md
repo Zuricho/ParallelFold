@@ -2,6 +2,8 @@
 
 This installation guide is for GPU supports CUDA driver version above 11.0
 
+If you are using CUDA 10.1, you can refer to [installation guide here](./install_cuda10.md)
+
 ## How to install 
 
 We recommend to install AlphaFold locally, and not using **docker**.
@@ -73,3 +75,8 @@ patch -p0 < $alphafold_path/setup/openmm.patch
 
 Based on our test, you need to use local cuda if you install cudatoolkit=10.1, you can skip this step if you are using cudatoolkit 11
 
+### References
+
+- [Official version](https://github.com/deepmind/alphafold) from DeepMind with docker. 
+- [None docker versions](https://github.com/kalininalab/alphafold_non_docker) install AlphaFold without docker. 
+- [My none docker guide](https://github.com/Zuricho/AlphaFold_local) adjusted to different cuda versions (cuda driver >= 10.1) 

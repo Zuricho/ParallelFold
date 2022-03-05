@@ -1,39 +1,12 @@
-<div align=center>
-<img src="./docs/parafoldlogo.png" width="400" >
-</div>
-<br>
+# Installation
 
-# ParallelFold
+This installation guide is for GPU supports CUDA driver version above 10.1
 
-Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
-
-:station: We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).
-
-:bookmark_tabs: Please cite our [paper](https://arxiv.org/abs/2111.06340) if you used ParallelFold (ParaFold) in you research. 
-
-## Overview
-
-This project is a modified version of DeepMind's [AlphaFold2](https://github.com/deepmind/alphafold) to achieve high-throughput protein structure prediction. 
-
-We have these following modifications to the original AlphaFold pipeline:
-
-- Divide **CPU part** (MSA and template searching) and **GPU part** (prediction model)
-
-**ParallelFold now supports AlphaFold 2.1.2**
-
-
+If you are using CUDA above 11.0, you can refer to [installation guide here](./install.md)
 
 ## How to install 
 
 We recommend to install AlphaFold locally, and not using **docker**.
-
-For CUDA 11, you can refer to the [installation guide here](./docs/install.md).
-
-For CUDA 10.1, you can refer to the [installation guide here](./docs/install_cuda10.md).
-
-
-
-
 
 ### Setting up conda environment
 
@@ -47,30 +20,23 @@ conda activate alphafold
 
 We recommend you to use python 3.8, python version < 3.7 may have missing packages.
 
-
-
 **Step 2**: Install `cudatoolkit` 10.1 and `cudnn`:
 
 ```bash
 conda install cudatoolkit=10.1 cudnn
-# conda install cudatoolkit=11.3 cudnn
 ```
 
 > - cudatoolkit 10.1 matches cudnn 7.6.5, supports TensorFlow 2.3.0
 >   - cudatoolkit supports TensorFlow 2.3.0, while sometimes TensorFlow can't find GPU when using cudatoolkit 10.2
-> 
+>
 > - cudatoolkit 11.3 matches cudnn 8.2.1
 > - For higher version of CUDA driver, you can install cudatoolkit 11.2 and TensorFlow 2.5.0 instead
-
-
 
 **Step 3**: Install tensorflow 2.3.0 by pip
 
 ```bash
 pip install tensorflow==2.3.0
 ```
-
-
 
 **Step 4**: Install other packages with pip and conda
 
@@ -83,8 +49,6 @@ conda install pandas=1.3.4
 # Using pip
 pip install biopython==1.79 chex==0.0.7 dm-haiku==0.0.4 dm-tree==0.1.6 immutabledict==2.0.0 jax==0.2.14 ml-collections==0.1.0
 pip install --upgrade jax jaxlib==0.1.69+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
-# pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
-
 ```
 
 >  jax installation reference: https://github.com/google/jax
@@ -98,8 +62,6 @@ pip install --upgrade jax jaxlib==0.1.69+cuda101 -f https://storage.googleapis.c
 
 Here you should used cuda 10.1 when you use cuda toolkit 10.1
 
-
-
 ### Clone This Repo
 
 ```bash
@@ -112,8 +74,6 @@ give the executive permission for sh files:
 ```bash
 chmod +x run_alphafold.sh
 ```
-
-
 
 ### Final Steps
 
@@ -140,93 +100,9 @@ Based on our test, you need to use local cuda if you install cudatoolkit=10.1, y
 
 Their might be some available modules: `cuda/10.1.243-gcc-8.3.0`, `cuda/10.2.89-gcc-8.3.0`
 
-
-
 ### References
 
 - [Official version](https://github.com/deepmind/alphafold) from DeepMind with docker. 
 - [None docker versions](https://github.com/kalininalab/alphafold_non_docker) install AlphaFold without docker. 
 - [My none docker guide](https://github.com/Zuricho/AlphaFold_local) adjusted to different cuda versions (cuda driver >= 10.1) 
-
-
-
-## Some detail information of modified files
-
-4 files:
-
-- `run_alphafold.py`: modified version of original `run_alphafold.py`, it has multiple additional functions like skipping featuring steps when exists `feature.pkl` in output folder
-- `run_alphafold.sh`: bash script to run `run_alphafold.py`
-- `run_figure`: this file can help you make figure for your system
-
-
-
-## How to run
-
-First, you need CPUs to run get features:
-
-```bash
-./run_alphafold.sh -d data -o output -p monomer_ptm -i input/test.fasta -t 2021-07-27 -m model_1 -f
-```
-
-`-f` means only run the featurization step, result in a `feature.pkl` file, and skip the following steps.
-
->  8 CPUs is enough, according to my test, more CPUs won't help with speed
-
-Featuring step will output the `feature.pkl`  and MSA folder in your output folder: `./output/FASTA_NAME/`
-
-PS: Here we put input files in an `input` folder to organize files in a better way.
-
-
-
-Second, you can run `run_alphafold.sh` using GPU:
-
-```bash
-./run_alphafold.sh -d data -o output -m model_1,model_2,model_3,model_4,model_5 -i input/test.fasta -t 2021-07-27
-```
-
-If you have successfully output `feature.pkl`, you can have a very fast featuring step
-
-
-
-Finally, you can run `run_figure.py` to visualize your result: [This will be available soon]
-
-```
-python run_figure.py [SystemName]
-```
-
-This python file will create a figure folder in your output folder.
-
-Notice: `run_figure.py` need a local conda environment with matplotlib, pymol and numpy.
-
-
-
-## Functions
-
-You can using some flags to change prediction model for ParallelFold:
-
-`-x`: Skip AMBER refinement
-
-`-b`: Using benchmark mode - running JAX model for twice, and the second run can used for evaluate running time
-
-`-r`: Change the number of cycles in recycling
-
-**Some more functions are under development.**
-
-
-
-## What is this for
-
-ParallelFold can help you accelerate AlphaFold when you want to predict multiple sequences. After dividing the CPU part and GPU part, users can finish feature step by multiple processors.
-
-Using ParallelFold, you can run AlphaFold 2~3 times faster than DeepMind's procedure. 
-
-
-
-**If you have any question, please send your problem in issues**
-
-
-
-
-
-
 
