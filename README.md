@@ -4,7 +4,7 @@
 
 # ParallelFold
 
-Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
+Author: Bozitao Zhong - zbztzhz@gmail.com
 
 :station: We are adding new functions to ParallelFold, you can see our [Roadmap](https://trello.com/b/sAqBIxBC/parallelfold).
 
@@ -42,56 +42,7 @@ For CUDA 10.1, you can refer to the [installation guide here](./docs/install_cud
 
 ## How to run
 
-**First**, you need CPUs to run get features:
-
-```bash
-./run_alphafold.sh \
--d data \
--o output \
--p monomer_ptm \
--i input/GA98.fasta \
--t 1800-01-01 \
--m model_1 \
--f
-
-```
-
-`-f` means only run the featurization step, result in a `feature.pkl` file, and skip the following steps.
-
->  8 CPUs is enough, according to my test, more CPUs won't help with speed
-
-Featuring step will output the `feature.pkl`  and MSA folder in your output folder: `./output/[FASTA_NAME]/`
-
-PS: Here we put input files in an `input` folder to organize files in a better way.
-
-
-
-**Second**, you can run `run_alphafold.sh` using GPU:
-
-```bash
-./run_alphafold.sh \
--d data \
--o output \
--m model_1,model_2,model_3,model_4,model_5 \
--p monomer_ptm \
--i input/GA98.fasta \
--t 1800-01-01 
-
-```
-
-If you have successfully output `feature.pkl`, you can have a very fast featuring step
-
-
-
-**Finally**, you can run `run_figure.py` to visualize your result: [This will be available soon]
-
-```bash
-python3 run_figure.py [SystemName]
-```
-
-This python file will create a figure folder in your output folder.
-
-Notice: `run_figure.py` need a local conda environment with matplotlib, pymol and numpy.
+Visit the [usage page](./usage.md) to know how to run
 
 
 
@@ -99,11 +50,11 @@ Notice: `run_figure.py` need a local conda environment with matplotlib, pymol an
 
 You can using some flags to change prediction model for ParallelFold:
 
-`-x`: Skip AMBER refinement [Under repair]
+`-r`: Skip AMBER refinement [Under repair]
 
 `-b`: Using benchmark mode - running JAX model for twice, and the second run can used for evaluate running time
 
-`-r`: Change the number of cycles in recycling
+`-R`: Change the number of cycles in recycling
 
 **More functions are under development.**
 

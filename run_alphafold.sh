@@ -18,10 +18,11 @@ usage() {
         echo "-g <use_gpu>            Enable NVIDIA runtime to run with GPUs (default: 'True')"
         echo "-u <gpu_devices>        Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
         echo "-c <db_preset>          Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
-        echo "-a <amber_relaxation>   Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
+        echo "-r <amber_relaxation>   Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
         echo "-m <model_selection>    Names of comma separated model names to use in prediction (default: All 5 models)"
-        echo "-r <recycling>          Set cycles for recycling (default: '3')"
+        echo "-R <recycling>          Set cycles for recycling (default: '3')"
         echo "-f <run_feature>        Only run MSA and template search to generate feature file"
+        echo "-G <use_gpu_relax>      Disable GPU relax"
         
         echo "Future Parameters (You cannot use them now):"
         echo "-v <visualizaion>       Automatic visualizaion of MSA, pLDDT, pTM of prediction results"
@@ -29,12 +30,12 @@ usage() {
         echo "-q <quick_mode>         Quick mode. Use small BFD database, no templates"
         echo "-k <is_prokaryote_list> Optional for multimer system, specifying true where the target complex is from a prokaryote"
         echo "-e <random_seed>        Set random seed"
-        echo "-l <precomputed_msas>   Use precomputed MSAs"
+        echo "-P <precomputed_msas>   Use precomputed MSAs"
         echo ""
         exit 1
 }
 
-while getopts ":d:o:p:i:t:u:c:m:r:bgravsqf" i; do
+while getopts ":d:o:p:i:t:u:c:m:R:bgrvsqfG" i; do
         case "${i}" in
         d)
                 data_dir=$OPTARG
@@ -63,7 +64,7 @@ while getopts ":d:o:p:i:t:u:c:m:r:bgravsqf" i; do
         c)
                 db_preset=$OPTARG
         ;;
-        a)
+        r)
                 amber_relaxation=false
         ;;
         m)
@@ -78,11 +79,14 @@ while getopts ":d:o:p:i:t:u:c:m:r:bgravsqf" i; do
         q)
                 quick_mode=true
         ;;
-        r)
+        R)
                 recycling=$OPTARG
         ;;
         f)
                 run_feature=true
+        ;;
+        G)
+                use_gpu_relax=false
         ;;
         esac
 done
@@ -140,6 +144,9 @@ if [[ "$run_feature" == "" ]] ; then
     run_feature=false
 fi
 
+if [[ "$use_gpu_relax" == "" ]] ; then
+    use_gpu_relax=true
+fi
 
 
 # This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits
@@ -172,13 +179,18 @@ template_mmcif_dir="$data_dir/pdb_mmcif/mmcif_files"
 obsolete_pdbs_path="$data_dir/pdb_mmcif/obsolete.dat"
 pdb70_database_path="$data_dir/pdb70/pdb70"
 pdb_seqres_database_path="$data_dir/pdb_seqres/pdb_seqres.txt"
-uniclust30_database_path="$data_dir/uniclust30/uniclust30_2018_08/uniclust30_2018_08"
+uniclust30_database_path="$data_dir/uniclust30/uniclust30_2018_08/uniclust30_2018_08"   # We recommend this use the 2020 version of uniclust
 uniref90_database_path="$data_dir/uniref90/uniref90.fasta"
 uniprot_database_path="$data_dir/uniprot/uniprot.fasta"
 
 
 if [[ "$db_preset" == "full_dbs" ]] ; then
     small_bfd_database_path=""
+fi
+
+if [[ "$db_preset" == "reduced_dbs" ]] ; then
+    bfd_database_path=""
+    uniclust30_database_path=""
 fi
 
 # Binary path (change me if required)
@@ -227,7 +239,7 @@ python $alphafold_script \
 --model_preset=$model_preset \
 --benchmark=$benchmark \
 --run_relax=$amber_relaxation \
---use_gpu_relax=true \
+--use_gpu_relax=$use_gpu_relax \
 --recycling=$recycling \
 --run_feature=$run_feature \
 --logtostderr
