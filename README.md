@@ -42,7 +42,7 @@ For CUDA 10.1, you can refer to the [installation guide here](./docs/install_cud
 
 ## How to run
 
-Visit the [usage page](./usage.md) to know how to run
+Visit the [usage page](./docs/usage.md) to know how to run
 
 
 
