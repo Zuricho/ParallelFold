@@ -144,7 +144,6 @@ fi
 
 # This bash script looks for the run_alphafold.py script in its current working directory, if it does not exist then exits
 #current_working_dir=$(pwd)
-#alphafold_script="$current_working_dir/run_alphafold.py"
 alphafold_script="$(readlink -f $(dirname $0))/run_alphafold.py"  
 
 
@@ -227,7 +226,8 @@ python $alphafold_script \
 --db_preset=$db_preset \
 --model_preset=$model_preset \
 --benchmark=$benchmark \
---amber_relaxation=$amber_relaxation \
+--run_relax=$amber_relaxation \
+--use_gpu_relax=true \
 --recycling=$recycling \
 --run_feature=$run_feature \
 --logtostderr

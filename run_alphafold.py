@@ -55,7 +55,7 @@ flags.DEFINE_list(
     'specifying true where the target complex is from a prokaryote, and false '
     'where it is not, or where the origin is unknown. These values determine '
     'the pairing method for the MSA.')
-
+flags.DEFINE_list('model_names', None, 'Names of models to use.')
 flags.DEFINE_string('data_dir', None, 'Path to directory of supporting data.')
 flags.DEFINE_string('output_dir', None, 'Path to a directory that will '
                     'store the results.')
@@ -129,6 +129,9 @@ flags.DEFINE_boolean('use_gpu_relax', None, 'Whether to relax on GPU. '
                      'Relax on GPU can be much faster than CPU, so it is '
                      'recommended to enable if possible. GPUs must be available'
                      ' if this setting is enabled.')
+flags.DEFINE_integer('recycling', 3, 'Set number of recyclings')
+flags.DEFINE_boolean('run_feature', False, 'Calculate MSA and template to generate '
+                     'feature')
 
 FLAGS = flags.FLAGS
 
@@ -158,6 +161,7 @@ def predict_structure(
     amber_relaxer: relax.AmberRelaxation,
     benchmark: bool,
     random_seed: int,
+    run_feature: bool,
     is_prokaryote: Optional[bool] = None):
   """Predicts structure using AlphaFold for the given sequence."""
   logging.info('Predicting %s', fasta_name)
@@ -171,21 +175,32 @@ def predict_structure(
 
   # Get features.
   t_0 = time.time()
-  if is_prokaryote is None:
-    feature_dict = data_pipeline.process(
-        input_fasta_path=fasta_path,
-        msa_output_dir=msa_output_dir)
+  features_output_path = os.path.join(output_dir, 'features.pkl')
+  
+  # If we already have feature.pkl file, skip the MSA and template finding step
+  if os.path.exists(features_output_path):
+    feature_dict = pickle.load(open(features_output_path, 'rb'))
+  
   else:
-    feature_dict = data_pipeline.process(
-        input_fasta_path=fasta_path,
-        msa_output_dir=msa_output_dir,
-        is_prokaryote=is_prokaryote)
-  timings['features'] = time.time() - t_0
+    if is_prokaryote is None:
+      feature_dict = data_pipeline.process(
+          input_fasta_path=fasta_path,
+          msa_output_dir=msa_output_dir)
+    else:
+      feature_dict = data_pipeline.process(
+          input_fasta_path=fasta_path,
+          msa_output_dir=msa_output_dir,
+          is_prokaryote=is_prokaryote)
 
   # Write out features as a pickled dictionary.
   features_output_path = os.path.join(output_dir, 'features.pkl')
   with open(features_output_path, 'wb') as f:
     pickle.dump(feature_dict, f, protocol=4)
+
+  timings['features'] = time.time() - t_0
+  
+  if run_feature:
+    sys.exit(0)
 
   unrelaxed_pdbs = {}
   relaxed_pdbs = {}
@@ -382,13 +397,19 @@ def main(argv):
     data_pipeline = monomer_data_pipeline
 
   model_runners = {}
-  model_names = config.MODEL_PRESETS[FLAGS.model_preset]
+  if FLAGS.model_names:
+    model_names = FLAGS.model_names
+  else:
+    model_names = config.MODEL_PRESETS[FLAGS.model_preset]
   for model_name in model_names:
     model_config = config.model_config(model_name)
     if run_multimer_system:
       model_config.model.num_ensemble_eval = num_ensemble
+      model_config.model.num_recycle = FLAGS.recycling
     else:
       model_config.data.eval.num_ensemble = num_ensemble
+      model_config.model.num_recycle = FLAGS.recycling
+      model_config.data.common.num_recycle = FLAGS.recycling
     model_params = data.get_model_haiku_params(
         model_name=model_name, data_dir=FLAGS.data_dir)
     model_runner = model.RunModel(model_config, model_params)
@@ -426,7 +447,9 @@ def main(argv):
         amber_relaxer=amber_relaxer,
         benchmark=FLAGS.benchmark,
         random_seed=random_seed,
-        is_prokaryote=is_prokaryote)
+        is_prokaryote=is_prokaryote,
+        run_feature = FLAGS.run_feature)
+    logging.info('%s AlphaFold structure prediction COMPLETE', fasta_name)
 
 
 if __name__ == '__main__':

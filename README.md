@@ -1,7 +1,7 @@
 # ParallelFold
 
 <div align=center>
-<img src="./figure/parafoldlogo.png" width="400" >
+<img src="./docs/parafoldlogo.png" width="400" >
 </div>
 
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
