@@ -1,6 +1,7 @@
 <div align=center>
 <img src="./docs/parafoldlogo.png" width="400" >
 </div>
+
 # ParallelFold
 
 Author: Bozitao Zhong :postbox:: zbztzhz@sjtu.edu.cn
