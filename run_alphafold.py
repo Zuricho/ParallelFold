@@ -200,7 +200,7 @@ def predict_structure(
   timings['features'] = time.time() - t_0
   
   if run_feature:
-    sys.exit(0)
+    return 0
 
   unrelaxed_pdbs = {}
   relaxed_pdbs = {}
