@@ -25,10 +25,8 @@ usage() {
         echo "-G <use_gpu_relax>      Disable GPU relax"
         
         echo "Future Parameters (You cannot use them now):"
-        echo "-v <visualizaion>       Automatic visualizaion of MSA, pLDDT, pTM of prediction results"
         echo "-s <skip_msa>           Skip MSA and template step, generate single sequence feature for ultimately fast prediction"
         echo "-q <quick_mode>         Quick mode. Use small BFD database, no templates"
-        echo "-k <is_prokaryote_list> Optional for multimer system, specifying true where the target complex is from a prokaryote"
         echo "-e <random_seed>        Set random seed"
         echo "-P <precomputed_msas>   Use precomputed MSAs"
         echo ""
@@ -202,7 +200,7 @@ hmmsearch_binary_path=$(which hmmsearch)
 hmmbuild_binary_path=$(which hmmbuild)
 
 # Temporary
-# Missing random_seed, is_prokaryote_list, use_precomputed_msas, amber_relaxation
+# Missing random_seed, use_precomputed_msas, amber_relaxation
 if [[ "$model_preset" == "monomer" || "$model_preset" == "monomer_ptm" ]] ; then
     pdb_seqres_database_path=""
     uniprot_database_path=""
