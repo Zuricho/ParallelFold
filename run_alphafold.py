@@ -50,7 +50,7 @@ flags.DEFINE_list(
     'separated by commas. All FASTA paths must have a unique basename as the '
     'basename is used to name the output directories for each prediction.')
 flags.DEFINE_list('model_names', None, 'Names of models to use.')
-flags.DEFINE_string('data_dir', None, 'Path to directory of supporting data.')
+flags.DEFINE_string('parameter_path', None, 'Path to directory of supporting data.')
 flags.DEFINE_string('output_dir', None, 'Path to a directory that will '
                     'store the results.')
 flags.DEFINE_string('jackhmmer_binary_path', shutil.which('jackhmmer'),
@@ -389,7 +389,7 @@ def main(argv):
       model_config.model.num_recycle = FLAGS.recycling
       model_config.data.common.num_recycle = FLAGS.recycling
     model_params = data.get_model_haiku_params(
-        model_name=model_name, data_dir=FLAGS.data_dir)
+        model_name=model_name, parameter_path=FLAGS.parameter_path)
     model_runner = model.RunModel(model_config, model_params)
     for i in range(num_predictions_per_model):
       model_runners[f'{model_name}_pred_{i}'] = model_runner
@@ -433,7 +433,7 @@ if __name__ == '__main__':
   flags.mark_flags_as_required([
       'fasta_paths',
       'output_dir',
-      'data_dir',
+      'parameter_path',
       'uniref90_database_path',
       'mgnify_database_path',
       'template_mmcif_dir',

@@ -170,6 +170,7 @@ export TF_FORCE_UNIFIED_MEMORY='1'
 export XLA_PYTHON_CLIENT_MEM_FRACTION='4.0'
 
 # Path and user config (change me if required)
+parameter_path="$data_dir/params/2.2"
 bfd_database_path="$data_dir/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt"
 small_bfd_database_path="$data_dir/small_bfd/bfd-first_non_consensus_sequences.fasta"
 mgnify_database_path="$data_dir/mgnify/mgy_clusters_2018_12.fa"
@@ -214,7 +215,7 @@ fi
 python $alphafold_script \
 --fasta_paths=$fasta_path \
 --model_names=$model_selection \
---data_dir=$data_dir \
+--parameter_path=$parameter_path \
 --output_dir=$output_dir \
 --jackhmmer_binary_path=$jackhmmer_binary_path \
 --hhblits_binary_path=$hhblits_binary_path \
