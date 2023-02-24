@@ -18,7 +18,7 @@ source activate parafold
 -p monomer_ptm \
 -u 0 \
 -i \
-input/mono_set_1/GA98.fasta \
+input/mono_set1/GA98.fasta \
 -t 2020-01-01 \
--r best 
+-r none
 

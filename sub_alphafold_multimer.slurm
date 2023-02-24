@@ -20,6 +20,5 @@ source activate parafold
 -u 0,1 \
 -i \
 input/complex_benchmark/MHC_TCR.fasta \
--t 2022-01-01 \
--r none
+-t 2022-01-01 -r
 

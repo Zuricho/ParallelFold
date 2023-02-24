@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Downloads and unzips the AlphaFold parameters.
+# Downloads and unzips the Uniclust30 database for AlphaFold.
 #
-# Usage: bash download_alphafold_params.sh /path/to/download/directory
+# Usage: bash download_uniclust30.sh /path/to/download/directory
 set -e
 
 if [[ $# -eq 0 ]]; then
@@ -30,12 +30,14 @@ if ! command -v aria2c &> /dev/null ; then
 fi
 
 DOWNLOAD_DIR="$1"
-ROOT_DIR="${DOWNLOAD_DIR}/params"
-SOURCE_URL="https://storage.googleapis.com/alphafold/alphafold_params_2022-01-19.tar"
+ROOT_DIR="${DOWNLOAD_DIR}/uniref30"
+# Mirror of:
+# https://wwwuser.gwdg.de/~compbiol/uniclust/2021_03/UniRef30_2021_03.tar.gz
+SOURCE_URL="https://storage.googleapis.com/alphafold-databases/v2.3/UniRef30_2021_03.tar.gz"
 BASENAME=$(basename "${SOURCE_URL}")
 
 mkdir --parents "${ROOT_DIR}"
 aria2c "${SOURCE_URL}" --dir="${ROOT_DIR}"
 tar --extract --verbose --file="${ROOT_DIR}/${BASENAME}" \
-  --directory="${ROOT_DIR}" --preserve-permissions
+  --directory="${ROOT_DIR}"
 rm "${ROOT_DIR}/${BASENAME}"

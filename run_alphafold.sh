@@ -18,7 +18,7 @@ usage() {
         echo "-g <use_gpu>            Enable NVIDIA runtime to run with GPUs (default: 'True')"
         echo "-u <gpu_devices>        Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
         echo "-c <db_preset>          Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
-        echo "-r <amber_relaxation>   Skip AMBER refinemet for predicted structure (default: 'True' - Using AMBER)"
+        echo "-r <models_to_relax>    'all': all models are relaxed, 'best': only the most confident model, 'none': no models are relaxed (default: 'all')"
         echo "-m <model_selection>    Names of comma separated model names to use in prediction (default: All 5 models)"
         echo "-R <recycling>          Set cycles for recycling (default: '3')"
         echo "-f <run_feature>        Only run MSA and template search to generate feature file"
@@ -33,7 +33,7 @@ usage() {
         exit 1
 }
 
-while getopts ":d:o:p:i:t:u:c:m:R:bgrvsqfG" i; do
+while getopts ":d:o:p:i:t:u:c:m:R:r:bgvsqfG" i; do
         case "${i}" in
         d)
                 data_dir=$OPTARG
@@ -63,7 +63,7 @@ while getopts ":d:o:p:i:t:u:c:m:R:bgrvsqfG" i; do
                 db_preset=$OPTARG
         ;;
         r)
-                amber_relaxation=false
+                models_to_relax=$OPTARG
         ;;
         m)
                 model_selection=$OPTARG
@@ -114,8 +114,8 @@ if [[ "$db_preset" == "" ]] ; then
     db_preset="full_dbs"
 fi
 
-if [[ "$amber_relaxation" == "" ]] ; then
-    amber_relaxation=true
+if [[ "$models_to_relax" == "" ]] ; then
+    models_to_relax="all"
 fi
 
 if [[ "$model_selection" == "" ]] ; then
@@ -170,7 +170,7 @@ export TF_FORCE_UNIFIED_MEMORY='1'
 export XLA_PYTHON_CLIENT_MEM_FRACTION='4.0'
 
 # Path and user config (change me if required)
-parameter_path="$data_dir/params/2.2"
+parameter_path="$data_dir/params"
 bfd_database_path="$data_dir/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt"
 small_bfd_database_path="$data_dir/small_bfd/bfd-first_non_consensus_sequences.fasta"
 mgnify_database_path="$data_dir/mgnify/mgy_clusters_2018_12.fa"
@@ -178,7 +178,7 @@ template_mmcif_dir="$data_dir/pdb_mmcif/mmcif_files"
 obsolete_pdbs_path="$data_dir/pdb_mmcif/obsolete.dat"
 pdb70_database_path="$data_dir/pdb70/pdb70"
 pdb_seqres_database_path="$data_dir/pdb_seqres/pdb_seqres.txt"
-uniclust30_database_path="$data_dir/uniclust30/uniclust30_2018_08/uniclust30_2018_08"   # We recommend this use the 2020 version of uniclust
+uniref30_database_path="$data_dir/uniclust30/uniclust30_2020_06/UniRef30_2020_06"  # We recommend this use the 2020 version of uniclust
 uniref90_database_path="$data_dir/uniref90/uniref90.fasta"
 uniprot_database_path="$data_dir/uniprot/uniprot.fasta"
 
@@ -189,7 +189,7 @@ fi
 
 if [[ "$db_preset" == "reduced_dbs" ]] ; then
     bfd_database_path=""
-    uniclust30_database_path=""
+    uniref30_database_path=""
 fi
 
 # Binary path (change me if required)
@@ -201,7 +201,7 @@ hmmsearch_binary_path=$(which hmmsearch)
 hmmbuild_binary_path=$(which hmmbuild)
 
 # Temporary
-# Missing random_seed, use_precomputed_msas, amber_relaxation
+# Missing random_seed, use_precomputed_msas
 if [[ "$model_preset" == "monomer" || "$model_preset" == "monomer_ptm" ]] ; then
     pdb_seqres_database_path=""
     uniprot_database_path=""
@@ -227,7 +227,7 @@ python $alphafold_script \
 --mgnify_database_path=$mgnify_database_path \
 --bfd_database_path=$bfd_database_path \
 --small_bfd_database_path=$small_bfd_database_path \
---uniclust30_database_path=$uniclust30_database_path \
+--uniref30_database_path=$uniref30_database_path \
 --uniprot_database_path=$uniprot_database_path \
 --pdb70_database_path=$pdb70_database_path \
 --pdb_seqres_database_path=$pdb_seqres_database_path \
@@ -237,7 +237,7 @@ python $alphafold_script \
 --db_preset=$db_preset \
 --model_preset=$model_preset \
 --benchmark=$benchmark \
---run_relax=$amber_relaxation \
+--models_to_relax=$models_to_relax \
 --use_gpu_relax=$use_gpu_relax \
 --recycling=$recycling \
 --run_feature=$run_feature \
