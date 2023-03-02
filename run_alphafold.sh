@@ -178,7 +178,7 @@ template_mmcif_dir="$data_dir/pdb_mmcif/mmcif_files"
 obsolete_pdbs_path="$data_dir/pdb_mmcif/obsolete.dat"
 pdb70_database_path="$data_dir/pdb70/pdb70"
 pdb_seqres_database_path="$data_dir/pdb_seqres/pdb_seqres.txt"
-uniref30_database_path="$data_dir/uniclust30/uniclust30_2020_06/UniRef30_2020_06"  # We recommend this use the 2020 version of uniclust
+uniref30_database_path="$data_dir/uniref30/UniRef30_2021_03"  # We recommend this use the 2020 version of uniclust
 uniref90_database_path="$data_dir/uniref90/uniref90.fasta"
 uniprot_database_path="$data_dir/uniprot/uniprot.fasta"
 
