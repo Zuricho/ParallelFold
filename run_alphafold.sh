@@ -16,7 +16,7 @@ usage() {
         echo "-t <max_template_date>  Maximum template release date to consider (YYYY-MM-DD format). (default: 2020-12-01)"
         echo "-b <benchmark>          Run multiple JAX model evaluations to obtain a timing that excludes the compilation time (default: 'False')"
         echo "-g <use_gpu>            Enable NVIDIA runtime to run with GPUs (default: 'True')"
-        echo "-u <gpu_devices>        Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: 'all')"
+        echo "-u <gpu_devices>        Comma separated list of devices to pass to 'CUDA_VISIBLE_DEVICES' (default: '0')"
         echo "-c <db_preset>          Choose database reduced_dbs or full_dbs (default: 'full_dbs')"
         echo "-r <models_to_relax>    'all': all models are relaxed, 'best': only the most confident model, 'none': no models are relaxed (default: 'all')"
         echo "-m <model_selection>    Names of comma separated model names to use in prediction (default: All 5 models)"
